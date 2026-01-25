@@ -1,6 +1,6 @@
-"use client";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
+import { Navigation } from "swiper/modules";
 import "swiper/css/navigation";
 import "swiper/css";
 import Image from "next/image";
@@ -11,7 +11,7 @@ import { useAppSelector } from "@/redux/store";
 const PreviewSliderModal = () => {
   const { closePreviewModal, isModalPreviewOpen } = usePreviewSlider();
 
-  const data = useAppSelector((state) => state.productDetailsReducer.value);
+  const data = useAppSelector((state) => state.productDetailsReducer.item);
 
   const sliderRef = useRef(null);
 
@@ -24,7 +24,7 @@ const PreviewSliderModal = () => {
     if (!sliderRef.current) return;
     sliderRef.current.swiper.slideNext();
   }, []);
-
+    
   return (
     <div
       className={`preview-slider w-full h-screen  z-999999 inset-0 flex justify-center items-center bg-[#000000F2] bg-opacity-70 ${isModalPreviewOpen ? "fixed" : "hidden"
@@ -35,7 +35,8 @@ const PreviewSliderModal = () => {
         aria-label="button for close modal"
         className="absolute top-0 right-0 sm:top-6 sm:right-6 flex items-center justify-center w-10 h-10 rounded-full ease-in duration-150 text-white hover:text-meta-5 z-10"
       >
-        <svg
+      {/* ... svg ... */}
+<svg
           className="fill-current"
           width="36"
           height="36"
@@ -52,9 +53,9 @@ const PreviewSliderModal = () => {
         </svg>
       </button>
 
-      <div>
+      <div className="w-full absolute top-1/2 -translate-y-1/2 flex justify-between px-4 sm:px-10 z-10 pointer-events-none">
         <button
-          className="rotate-180 absolute left-100 p-5 cursor-pointer z-10 "
+          className="rotate-180 p-2 cursor-pointer pointer-events-auto text-white hover:text-blue transition-colors"
           onClick={handlePrev}
         >
           <svg
@@ -68,13 +69,13 @@ const PreviewSliderModal = () => {
               fillRule="evenodd"
               clipRule="evenodd"
               d="M14.5918 5.92548C14.9091 5.60817 15.4236 5.60817 15.7409 5.92548L22.2409 12.4255C22.5582 12.7428 22.5582 13.2572 22.2409 13.5745L15.7409 20.0745C15.4236 20.3918 14.9091 20.3918 14.5918 20.0745C14.2745 19.7572 14.2745 19.2428 14.5918 18.9255L19.7048 13.8125H4.33301C3.88428 13.8125 3.52051 13.4487 3.52051 13C3.52051 12.5513 3.88428 12.1875 4.33301 12.1875H19.7048L14.5918 7.07452C14.2745 6.75722 14.2745 6.24278 14.5918 5.92548Z"
-              fill="#FDFDFD"
+              fill="currentColor"
             />
           </svg>
         </button>
 
         <button
-          className="absolute right-100 p-5 cursor-pointer z-10"
+          className="p-2 cursor-pointer pointer-events-auto text-white hover:text-blue transition-colors"
           onClick={handleNext}
         >
           <svg
@@ -88,33 +89,51 @@ const PreviewSliderModal = () => {
               fillRule="evenodd"
               clipRule="evenodd"
               d="M14.5918 5.92548C14.9091 5.60817 15.4236 5.60817 15.7409 5.92548L22.2409 12.4255C22.5582 12.7428 22.5582 13.2572 22.2409 13.5745L15.7409 20.0745C15.4236 20.3918 14.9091 20.3918 14.5918 20.0745C14.2745 19.7572 14.2745 19.2428 14.5918 18.9255L19.7048 13.8125H4.33301C3.88428 13.8125 3.52051 13.4487 3.52051 13C3.52051 12.5513 3.88428 12.1875 4.33301 12.1875H19.7048L14.5918 7.07452C14.2745 6.75722 14.2745 6.24278 14.5918 5.92548Z"
-              fill="#FDFDFD"
+              fill="currentColor"
             />
           </svg>
         </button>
       </div>
 
-      <Swiper ref={sliderRef} slidesPerView={1} spaceBetween={20}>
-        <SwiperSlide>
-          <div className="flex justify-center items-center">
-            <Image
-              src={"/images/products/product-2-bg-1.png"}
-              alt={"product image"}
-              width={450}
-              height={450}
-            />
-          </div>
-        </SwiperSlide>
-        <SwiperSlide>
-          <div className="flex justify-center items-center">
-            <Image
-              src={"/images/products/product-2-bg-1.png"}
-              alt={"product image"}
-              width={450}
-              height={450}
-            />
-          </div>
-        </SwiperSlide>
+      <Swiper
+        ref={sliderRef}
+        modules={[Navigation]}
+        slidesPerView={1}
+        spaceBetween={20}
+        observer={true}
+        observeParents={true}
+        loop={true}
+        className="w-full h-full"
+      >
+        {data?.images?.length ? (
+          data.images.map((img, index) => (
+            <SwiperSlide key={index}>
+              <div className="flex justify-center items-center w-full h-full">
+                <Image
+                  src={img.image}
+                  alt={data.name || "product image"}
+                  width={800}
+                  height={800}
+                  className="max-h-[85vh] w-auto object-contain"
+                  style={{ width: 'auto', height: 'auto' }} // Ensure aspect ratio
+                />
+              </div>
+            </SwiperSlide>
+          ))
+        ) : (
+          <SwiperSlide>
+            <div className="flex justify-center items-center w-full h-full">
+              <Image
+                src={data?.image || "/images/product/product-01.png"}
+                alt={data?.name || "product image"}
+                width={800}
+                height={800}
+                className="max-h-[85vh] w-auto object-contain"
+                style={{ width: 'auto', height: 'auto' }}
+              />
+            </div>
+          </SwiperSlide>
+        )}
       </Swiper>
     </div>
   );

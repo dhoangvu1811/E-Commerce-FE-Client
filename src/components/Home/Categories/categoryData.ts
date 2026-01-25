@@ -1,44 +1,52 @@
 const data = [
   {
-    title: "Televisions",
+    name: 'Televisions',
     id: 1,
-    img: "/images/categories/categories-01.png",
+    image: '/images/categories/categories-01.png',
+    slug: 'televisions'
   },
   {
-    title: "Laptop & PC",
+    name: 'Laptop & PC',
     id: 2,
-    img: "/images/categories/categories-02.png",
+    image: '/images/categories/categories-02.png',
+    slug: 'laptop-pc'
   },
   {
-    title: "Mobile & Tablets",
+    name: 'Mobile & Tablets',
     id: 3,
-    img: "/images/categories/categories-03.png",
+    image: '/images/categories/categories-03.png',
+    slug: 'mobile-tablets'
   },
   {
-    title: "Games & Videos",
+    name: 'Games & Videos',
     id: 4,
-    img: "/images/categories/categories-04.png",
+    image: '/images/categories/categories-04.png',
+    slug: 'games-videos'
   },
   {
-    title: "Home Appliances",
+    name: 'Home Appliances',
     id: 5,
-    img: "/images/categories/categories-05.png",
+    image: '/images/categories/categories-05.png',
+    slug: 'home-appliances'
   },
   {
-    title: "Health & Sports",
+    name: 'Health & Sports',
     id: 6,
-    img: "/images/categories/categories-06.png",
+    image: '/images/categories/categories-06.png',
+    slug: 'health-sports'
   },
   {
-    title: "Watches",
+    name: 'Watches',
     id: 7,
-    img: "/images/categories/categories-07.png",
+    image: '/images/categories/categories-07.png',
+    slug: 'watches'
   },
   {
-    title: "Televisions",
+    name: 'Televisions',
     id: 8,
-    img: "/images/categories/categories-04.png",
-  },
-];
+    image: '/images/categories/categories-04.png',
+    slug: 'televisions-2'
+  }
+]
 
-export default data;
+export default data
