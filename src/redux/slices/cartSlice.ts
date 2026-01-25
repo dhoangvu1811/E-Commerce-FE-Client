@@ -2,7 +2,7 @@ import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../store'
 
 type InitialState = {
-  items: CartItem[]
+  cartItems: CartItem[]
 }
 
 type CartItem = {
@@ -15,7 +15,7 @@ type CartItem = {
 }
 
 const initialState: InitialState = {
-  items: []
+  cartItems: []
 }
 
 export const cart = createSlice({
@@ -25,12 +25,12 @@ export const cart = createSlice({
     addItemToCart: (state, action: PayloadAction<CartItem>) => {
       const { id, name, price, quantity, discountedPrice, image } =
         action.payload
-      const existingItem = state.items.find((item) => item.id === id)
+      const existingItem = state.cartItems.find((item) => item.id === id)
 
       if (existingItem) {
         existingItem.quantity += quantity
       } else {
-        state.items.push({
+        state.cartItems.push({
           id,
           name,
           price,
@@ -42,14 +42,14 @@ export const cart = createSlice({
     },
     removeItemFromCart: (state, action: PayloadAction<number>) => {
       const itemId = action.payload
-      state.items = state.items.filter((item) => item.id !== itemId)
+      state.cartItems = state.cartItems.filter((item) => item.id !== itemId)
     },
     updateCartItemQuantity: (
       state,
       action: PayloadAction<{ id: number; quantity: number }>
     ) => {
       const { id, quantity } = action.payload
-      const existingItem = state.items.find((item) => item.id === id)
+      const existingItem = state.cartItems.find((item) => item.id === id)
 
       if (existingItem) {
         existingItem.quantity = quantity
@@ -57,12 +57,12 @@ export const cart = createSlice({
     },
 
     removeAllItemsFromCart: (state) => {
-      state.items = []
+      state.cartItems = []
     }
   }
 })
 
-export const selectCartItems = (state: RootState) => state.cartReducer.items
+export const selectCartItems = (state: RootState) => state.cartReducer.cartItems
 
 export const selectTotalPrice = createSelector([selectCartItems], (items) => {
   return items.reduce((total, item) => {

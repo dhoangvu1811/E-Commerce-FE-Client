@@ -3,13 +3,13 @@ import { productService } from '@/services'
 import { Category } from '@/types/product.type'
 
 interface CategoryState {
-  items: Category[]
+  categories: Category[]
   loading: boolean
   error: string | null
 }
 
 const initialState: CategoryState = {
-  items: [],
+  categories: [],
   loading: false,
   error: null
 }
@@ -18,8 +18,8 @@ export const fetchCategories = createAsyncThunk(
   'categories/fetchCategories',
   async (_, { rejectWithValue }) => {
     try {
-      const data = await productService.getAllCategories()
-      return data.data
+      const response = await productService.getAllCategories()
+      return response.data.categories
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Failed to fetch categories'
@@ -40,7 +40,7 @@ export const categorySlice = createSlice({
       })
       .addCase(fetchCategories.fulfilled, (state, action) => {
         state.loading = false
-        state.items = action.payload
+        state.categories = action.payload
       })
       .addCase(fetchCategories.rejected, (state, action) => {
         state.loading = false

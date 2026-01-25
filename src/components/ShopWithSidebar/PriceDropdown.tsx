@@ -63,7 +63,7 @@ const PriceDropdown = () => {
             <div className='price-amount flex items-center justify-between pt-4'>
               <div className='text-custom-xs text-dark-4 flex rounded border border-gray-3/80'>
                 <span className='block border-r border-gray-3/80 px-2.5 py-1.5'>
-                  $
+                  ₫
                 </span>
                 <span id='minAmount' className='block px-3 py-1.5'>
                   {selectedPrice.from}
@@ -72,7 +72,7 @@ const PriceDropdown = () => {
 
               <div className='text-custom-xs text-dark-4 flex rounded border border-gray-3/80'>
                 <span className='block border-r border-gray-3/80 px-2.5 py-1.5'>
-                  $
+                  ₫
                 </span>
                 <span id='maxAmount' className='block px-3 py-1.5'>
                   {selectedPrice.to}

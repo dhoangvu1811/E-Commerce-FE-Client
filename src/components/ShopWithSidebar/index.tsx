@@ -22,14 +22,10 @@ const ShopWithSidebar = () => {
   const categoryIdParam = searchParams.get('categoryId')
 
   const dispatch = useAppDispatch()
-  const {
-    items: products,
-    loading,
-    pagination
-  } = useAppSelector((state) => state.productsReducer)
-  const { items: categories } = useAppSelector(
-    (state) => state.categoriesReducer
+  const { products, loading, pagination } = useAppSelector(
+    (state) => state.productsReducer
   )
+  const { categories } = useAppSelector((state) => state.categoriesReducer)
 
   const [productStyle, setProductStyle] = useState('grid')
   const [productSidebar, setProductSidebar] = useState(false)
