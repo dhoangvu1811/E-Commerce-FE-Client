@@ -34,3 +34,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 docs/commit-message-instruction.md
+.agent
+.agents
+docs/client_catalog_api_doc.md
