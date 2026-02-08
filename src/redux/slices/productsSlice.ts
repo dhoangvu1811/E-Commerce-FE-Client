@@ -17,9 +17,11 @@ const initialState: ProductsState = {
   error: null,
   pagination: {
     page: 1,
+    itemsPerPage: 10,
+    totalItems: 0,
     totalPages: 1,
-    total: 0,
-    limit: 10
+    hasNextPage: false,
+    hasPrevPage: false
   }
 }
 
