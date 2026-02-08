@@ -3,7 +3,9 @@ import type {
   ProductListResponse,
   ProductDetailResponse,
   ProductFilters,
-  ProductCategoryResponse
+  ProductCategoryResponse,
+  CategoryDetailResponse,
+  CategoryFilters
 } from '@/types/product.type'
 
 export const productService = {
@@ -22,11 +24,25 @@ export const productService = {
   },
 
   /**
-   * Get all product categories
+   * Get all product categories with pagination and search
    */
-  getAllCategories: async () => {
+  getAllCategories: async (params?: CategoryFilters) => {
     const response = await axiosClient.get<ProductCategoryResponse>(
-      API_ENDPOINTS.CATEGORIES.ALL
+      API_ENDPOINTS.CATEGORIES.ALL,
+      {
+        params
+      }
+    )
+
+    return response.data
+  },
+
+  /**
+   * Get category details by ID
+   */
+  getCategoryById: async (id: number | string) => {
+    const response = await axiosClient.get<CategoryDetailResponse>(
+      API_ENDPOINTS.CATEGORIES.DETAILS(id)
     )
 
     return response.data
