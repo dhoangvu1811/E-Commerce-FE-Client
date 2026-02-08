@@ -15,11 +15,9 @@ const ShopWithoutSidebar = () => {
   const [page, setPage] = useState(1)
 
   const dispatch = useAppDispatch()
-  const {
-    items: products,
-    loading,
-    pagination
-  } = useAppSelector((state) => state.productsReducer)
+  const { products, loading, pagination } = useAppSelector(
+    (state) => state.productsReducer
+  )
 
   const { register, watch } = useForm({
     defaultValues: {

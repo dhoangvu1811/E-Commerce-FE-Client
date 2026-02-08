@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 type InitialState = {
-  items: WishListItem[]
+  wishlistItems: WishListItem[]
 }
 
 type WishListItem = {
@@ -15,7 +15,7 @@ type WishListItem = {
 }
 
 const initialState: InitialState = {
-  items: []
+  wishlistItems: []
 }
 
 export const wishlist = createSlice({
@@ -25,12 +25,12 @@ export const wishlist = createSlice({
     addItemToWishlist: (state, action: PayloadAction<WishListItem>) => {
       const { id, name, price, quantity, image, discountedPrice, status } =
         action.payload
-      const existingItem = state.items.find((item) => item.id === id)
+      const existingItem = state.wishlistItems.find((item) => item.id === id)
 
       if (existingItem) {
         existingItem.quantity += quantity
       } else {
-        state.items.push({
+        state.wishlistItems.push({
           id,
           name,
           price,
@@ -43,11 +43,13 @@ export const wishlist = createSlice({
     },
     removeItemFromWishlist: (state, action: PayloadAction<number>) => {
       const itemId = action.payload
-      state.items = state.items.filter((item) => item.id !== itemId)
+      state.wishlistItems = state.wishlistItems.filter(
+        (item) => item.id !== itemId
+      )
     },
 
     removeAllItemsFromWishlist: (state) => {
-      state.items = []
+      state.wishlistItems = []
     }
   }
 })

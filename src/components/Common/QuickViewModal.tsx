@@ -1,5 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
+import { formatCurrency } from '@/utils/formatCurrency'
 
 import { useModalContext } from '@/app/context/QuickViewModalContext'
 import { AppDispatch, useAppSelector } from '@/redux/store'
@@ -257,11 +258,11 @@ const QuickViewModal = () => {
 
                   <span className='flex items-center gap-2'>
                     <span className='font-semibold text-dark text-xl xl:text-heading-4'>
-                      ${discountedPrice.toLocaleString()}
+                      {formatCurrency(discountedPrice)}
                     </span>
                     {discount > 0 && (
                       <span className='font-medium text-dark-4 text-lg xl:text-2xl line-through'>
-                        ${price.toLocaleString()}
+                        {formatCurrency(price)}
                       </span>
                     )}
                   </span>

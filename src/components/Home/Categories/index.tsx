@@ -12,7 +12,7 @@ import 'swiper/css'
 
 const Categories = () => {
   const dispatch = useAppDispatch()
-  const { items: categories, loading } = useAppSelector(
+  const { categories, loading } = useAppSelector(
     (state) => state.categoriesReducer
   )
   const sliderRef = useRef<any>(null)

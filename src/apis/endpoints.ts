@@ -13,6 +13,27 @@ export const API_ENDPOINTS = {
   CATEGORIES: {
     ALL: '/categories',
     DETAILS: (id: number | string) => `/categories/${id}`
+  },
+
+  // Auth & User Management
+  AUTH: {
+    REGISTER: '/users/register',
+    LOGIN: '/users/login',
+    LOGOUT: '/users/logout',
+    REFRESH_TOKEN: '/users/refresh-token',
+    GOOGLE: '/users/auth/google',
+    FACEBOOK: '/users/auth/facebook'
+  },
+  USER: {
+    PROFILE: '/users/me',
+    CHANGE_PASSWORD: '/users/me/password',
+    MY_SESSIONS: '/users/my-sessions',
+    REVOKE_SESSION: '/users/revoke-my-session'
+  },
+  ORDERS: {
+    MY_ORDERS: '/orders/my-orders',
+    DETAILS: '/orders/details/:id',
+    CANCEL: '/orders/cancel/:id'
   }
 } as const
 

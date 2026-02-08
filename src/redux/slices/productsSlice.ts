@@ -5,14 +5,14 @@ import { Product, ProductFilters } from '@/types/product.type'
 import { PaginationInfo } from '@/types/api.type'
 
 interface ProductsState {
-  items: Product[]
+  products: Product[]
   loading: boolean
   error: string | null
   pagination: PaginationInfo
 }
 
 const initialState: ProductsState = {
-  items: [],
+  products: [],
   loading: false,
   error: null,
   pagination: {
@@ -27,8 +27,8 @@ export const fetchProducts = createAsyncThunk(
   'products/fetchProducts',
   async (params: ProductFilters, { rejectWithValue }) => {
     try {
-      const data = await productService.getAll(params)
-      return data.data
+      const response = await productService.getAll(params)
+      return response.data
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Failed to fetch products'
@@ -49,7 +49,7 @@ export const productsSlice = createSlice({
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false
-        state.items = action.payload.products
+        state.products = action.payload.products
         state.pagination = action.payload.pagination
       })
       .addCase(fetchProducts.rejected, (state, action) => {

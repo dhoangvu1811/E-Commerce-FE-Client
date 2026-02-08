@@ -84,7 +84,10 @@ export interface ProductDetailResponse {
 export interface ProductCategoryResponse {
   code: number
   message: string
-  data: Category[]
+  data: {
+    categories: Category[]
+    pagination: PaginationInfo
+  }
 }
 
 // =========================================
