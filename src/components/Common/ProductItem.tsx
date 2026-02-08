@@ -1,20 +1,24 @@
 "use client";
 import React from "react";
 import Image from "next/image";
-import { Product } from "@/types/product";
+import { Product } from "@/types/product.type";
 import { useModalContext } from "@/app/context/QuickViewModalContext";
-import { updateQuickView } from "@/redux/features/quickView-slice";
-import { addItemToCart } from "@/redux/features/cart-slice";
-import { addItemToWishlist } from "@/redux/features/wishlist-slice";
-import { updateproductDetails } from "@/redux/features/product-details";
+import { updateQuickView } from "@/redux/slices/quickViewSlice";
+import { addItemToCart } from "@/redux/slices/cartSlice";
+import { addItemToWishlist } from "@/redux/slices/wishlistSlice";
+import { setProductDetails } from "@/redux/slices/productDetailsSlice";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import Link from "next/link";
 
 const ProductItem = ({ item }: { item: Product }) => {
   const { openModal } = useModalContext();
-
   const dispatch = useDispatch<AppDispatch>();
+
+  // Calculate discount and price
+  const price = Number(item.price);
+  const discount = Number(item.discount);
+  const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
 
   // update the QuickView state
   const handleQuickViewUpdate = () => {
@@ -25,7 +29,11 @@ const ProductItem = ({ item }: { item: Product }) => {
   const handleAddToCart = () => {
     dispatch(
       addItemToCart({
-        ...item,
+        id: item.id,
+        name: item.name,
+        price,
+        image: item.image || item.images?.[0]?.image || '/images/product/product-01.png',
+        discountedPrice,
         quantity: 1,
       })
     );
@@ -34,21 +42,25 @@ const ProductItem = ({ item }: { item: Product }) => {
   const handleItemToWishList = () => {
     dispatch(
       addItemToWishlist({
-        ...item,
-        status: "available",
+        id: item.id,
+        name: item.name,
+        price,
+        image: item.image || item.images?.[0]?.image || '/images/product/product-01.png',
+        discountedPrice,
         quantity: 1,
+        status: "available",
       })
     );
   };
 
   const handleProductDetails = () => {
-    dispatch(updateproductDetails({ ...item }));
+    dispatch(setProductDetails({ ...item }));
   };
 
   return (
     <div className="group">
       <div className="relative overflow-hidden flex items-center justify-center rounded-lg bg-[#F6F7FB] min-h-[270px] mb-4">
-        <Image src={item.imgs.previews[0]} alt="" width={250} height={250} />
+        <Image src={item.image || item.images?.[0]?.image || '/images/product/product-01.png'} alt={item.name} width={250} height={250} />
 
         <div className="absolute left-0 bottom-0 translate-y-full w-full flex items-center justify-center gap-2.5 pb-5 ease-linear duration-200 group-hover:translate-y-0">
           <button
@@ -117,51 +129,30 @@ const ProductItem = ({ item }: { item: Product }) => {
 
       <div className="flex items-center gap-2.5 mb-2">
         <div className="flex items-center gap-1">
-          <Image
-            src="/images/icons/icon-star.svg"
-            alt="star icon"
-            width={14}
-            height={14}
-          />
-          <Image
-            src="/images/icons/icon-star.svg"
-            alt="star icon"
-            width={14}
-            height={14}
-          />
-          <Image
-            src="/images/icons/icon-star.svg"
-            alt="star icon"
-            width={14}
-            height={14}
-          />
-          <Image
-            src="/images/icons/icon-star.svg"
-            alt="star icon"
-            width={14}
-            height={14}
-          />
-          <Image
-            src="/images/icons/icon-star.svg"
-            alt="star icon"
-            width={14}
-            height={14}
-          />
+          {[1, 2, 3, 4, 5].map((star) => (
+            <Image
+              key={star}
+              src="/images/icons/icon-star.svg"
+              alt="star icon"
+              width={14}
+              height={14}
+            />
+          ))}
         </div>
 
-        <p className="text-custom-sm">({item.reviews})</p>
+        <p className="text-custom-sm">({item.rating || 0})</p>
       </div>
 
       <h3
         className="font-medium text-dark ease-out duration-200 hover:text-blue mb-1.5"
         onClick={() => handleProductDetails()}
       >
-        <Link href="/shop-details"> {item.title} </Link>
+        <Link href="/shop-details"> {item.name} </Link>
       </h3>
 
       <span className="flex items-center gap-2 font-medium text-lg">
-        <span className="text-dark">${item.discountedPrice}</span>
-        <span className="text-dark-4 line-through">${item.price}</span>
+        <span className="text-dark">${discountedPrice.toLocaleString()}</span>
+        {discount > 0 && <span className="text-dark-4 line-through">${price.toLocaleString()}</span>}
       </span>
     </div>
   );

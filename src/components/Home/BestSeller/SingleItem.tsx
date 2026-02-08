@@ -1,18 +1,23 @@
 "use client";
 import React from "react";
-import { Product } from "@/types/product";
+import { Product } from "@/types/product.type";
 import { useModalContext } from "@/app/context/QuickViewModalContext";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
-import { updateQuickView } from "@/redux/features/quickView-slice";
-import { addItemToCart } from "@/redux/features/cart-slice";
+import { updateQuickView } from "@/redux/slices/quickViewSlice";
+import { addItemToCart } from "@/redux/slices/cartSlice";
 import Image from "next/image";
 import Link from "next/link";
-import { addItemToWishlist } from "@/redux/features/wishlist-slice";
+import { addItemToWishlist } from "@/redux/slices/wishlistSlice";
 
 const SingleItem = ({ item }: { item: Product }) => {
   const { openModal } = useModalContext();
   const dispatch = useDispatch<AppDispatch>();
+
+  // Calculate discount and price
+  const price = Number(item.price);
+  const discount = Number(item.discount);
+  const discountedPrice = discount > 0 ? price * (1 - discount / 100) : price;
 
   // update the QuickView state
   const handleQuickViewUpdate = () => {
@@ -23,7 +28,11 @@ const SingleItem = ({ item }: { item: Product }) => {
   const handleAddToCart = () => {
     dispatch(
       addItemToCart({
-        ...item,
+        id: item.id,
+        name: item.name,
+        price,
+        image: item.image || item.images?.[0]?.image || '/images/product/product-01.png',
+        discountedPrice,
         quantity: 1,
       })
     );
@@ -32,9 +41,13 @@ const SingleItem = ({ item }: { item: Product }) => {
   const handleItemToWishList = () => {
     dispatch(
       addItemToWishlist({
-        ...item,
-        status: "available",
+        id: item.id,
+        name: item.name,
+        price,
+        image: item.image || item.images?.[0]?.image || '/images/product/product-01.png',
+        discountedPrice,
         quantity: 1,
+        status: "available",
       })
     );
   };
@@ -45,53 +58,32 @@ const SingleItem = ({ item }: { item: Product }) => {
         <div className="text-center px-4 py-7.5">
           <div className="flex items-center justify-center gap-2.5 mb-2">
             <div className="flex items-center gap-1">
-              <Image
-                src="/images/icons/icon-star.svg"
-                alt="star icon"
-                width={14}
-                height={14}
-              />
-              <Image
-                src="/images/icons/icon-star.svg"
-                alt="star icon"
-                width={14}
-                height={14}
-              />
-              <Image
-                src="/images/icons/icon-star.svg"
-                alt="star icon"
-                width={14}
-                height={14}
-              />
-              <Image
-                src="/images/icons/icon-star.svg"
-                alt="star icon"
-                width={14}
-                height={14}
-              />
-              <Image
-                src="/images/icons/icon-star.svg"
-                alt="star icon"
-                width={14}
-                height={14}
-              />
+              {[1, 2, 3, 4, 5].map((star) => (
+                <Image
+                  key={star}
+                  src="/images/icons/icon-star.svg"
+                  alt="star icon"
+                  width={14}
+                  height={14}
+                />
+              ))}
             </div>
 
-            <p className="text-custom-sm">({item.reviews})</p>
+            <p className="text-custom-sm">({item.rating || 0})</p>
           </div>
 
           <h3 className="font-medium text-dark ease-out duration-200 hover:text-blue mb-1.5">
-            <Link href="/shop-details"> {item.title} </Link>
+            <Link href={`/shop-details?id=${item.id}`}> {item.name} </Link>
           </h3>
 
           <span className="flex items-center justify-center gap-2 font-medium text-lg">
-            <span className="text-dark">${item.discountedPrice}</span>
-            <span className="text-dark-4 line-through">${item.price}</span>
+            <span className="text-dark">${discountedPrice.toLocaleString()}</span>
+            {discount > 0 && <span className="text-dark-4 line-through">${price.toLocaleString()}</span>}
           </span>
         </div>
 
         <div className="flex justify-center items-center">
-          <Image src={item.imgs.previews[0]} alt="" width={280} height={280} />
+          <Image src={item.image || item.images?.[0]?.image || '/images/product/product-01.png'} alt={item.name} width={280} height={280} />
         </div>
 
         <div className="absolute right-0 bottom-0 translate-x-full u-w-full flex flex-col gap-2 p-5.5 ease-linear duration-300 group-hover:translate-x-0">

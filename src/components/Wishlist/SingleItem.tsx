@@ -2,8 +2,8 @@ import React from "react";
 import { AppDispatch } from "@/redux/store";
 import { useDispatch } from "react-redux";
 
-import { removeItemFromWishlist } from "@/redux/features/wishlist-slice";
-import { addItemToCart } from "@/redux/features/cart-slice";
+import { removeItemFromWishlist } from "@/redux/slices/wishlistSlice";
+import { addItemToCart } from "@/redux/slices/cartSlice";
 
 import Image from "next/image";
 
@@ -57,12 +57,12 @@ const SingleItem = ({ item }) => {
         <div className="flex items-center justify-between gap-5">
           <div className="w-full flex items-center gap-5.5">
             <div className="flex items-center justify-center rounded-[5px] bg-gray-2 max-w-[80px] w-full h-17.5">
-              <Image src={item.imgs?.thumbnails[0]} alt="product" width={200} height={200} />
+              <Image src={item.image} alt="product" width={200} height={200} />
             </div>
 
             <div>
               <h3 className="text-dark ease-out duration-200 hover:text-blue">
-                <a href="#"> {item.title} </a>
+                <a href="#"> {item.name} </a>
               </h3>
             </div>
           </div>
