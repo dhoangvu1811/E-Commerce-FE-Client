@@ -1,23 +1,58 @@
 import React, { useState, useEffect } from 'react'
 
-const CustomSelect = ({ options }) => {
+interface Option {
+  label: string
+  value: string
+}
+
+interface CustomSelectProps {
+  options: Option[]
+  value?: string
+  onChange?: (value: string) => void
+  placeholder?: string
+}
+
+const CustomSelect: React.FC<CustomSelectProps> = ({ 
+  options, 
+  value, 
+  onChange,
+  placeholder 
+}) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [selectedOption, setSelectedOption] = useState(options[0])
+  const [selectedOption, setSelectedOption] = useState<Option>(
+    value 
+      ? options.find(opt => opt.value === value) || options[0]
+      : options[0]
+  )
+
+  // Update selected option when value prop changes
+  useEffect(() => {
+    if (value !== undefined) {
+      const option = options.find(opt => opt.value === value)
+      if (option) {
+        setSelectedOption(option)
+      }
+    }
+  }, [value, options])
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen)
   }
 
-  const handleOptionClick = (option) => {
+  const handleOptionClick = (option: Option) => {
     setSelectedOption(option)
-    toggleDropdown()
+    setIsOpen(false)
+    // Call onChange callback if provided
+    if (onChange) {
+      onChange(option.value)
+    }
   }
 
   useEffect(() => {
     // closing modal while clicking outside
-    function handleClickOutside(event) {
-      if (!event.target.closest('.dropdown-content')) {
-        toggleDropdown()
+    function handleClickOutside(event: MouseEvent) {
+      if (!(event.target as Element).closest('.dropdown-content')) {
+        setIsOpen(false)
       }
     }
 
@@ -28,7 +63,7 @@ const CustomSelect = ({ options }) => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [])
+  }, [isOpen])
 
   return (
     <div

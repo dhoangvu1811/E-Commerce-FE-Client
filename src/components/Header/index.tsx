@@ -1,6 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import CustomSelect from './CustomSelect'
 import { menuData } from './menuData'
 import Dropdown from './Dropdown'
@@ -15,7 +16,9 @@ import { fetchCategories } from '@/redux/slices/categorySlice'
 import { fetchProfile, logout } from '@/redux/slices/authSlice'
 
 const Header = () => {
+  const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState('')
   const [navigationOpen, setNavigationOpen] = useState(false)
   const [stickyMenu, setStickyMenu] = useState(false)
   const { openCartModal } = useCartModalContext()
@@ -27,7 +30,7 @@ const Header = () => {
   const totalPrice = useSelector(selectTotalPrice)
 
   useEffect(() => {
-    dispatch(fetchCategories())
+    dispatch(fetchCategories(undefined))
     dispatch(fetchProfile())
   }, [dispatch])
 
@@ -52,6 +55,36 @@ const Header = () => {
     { label: 'All Categories', value: '' },
     ...categories.map((cat) => ({ label: cat.name, value: String(cat.id) }))
   ]
+
+  const handleCategoryChange = (categoryId: string) => {
+    setSelectedCategory(categoryId)
+    // Clear search when changing category
+    setSearchQuery('')
+    
+    if (categoryId) {
+      // Navigate to shop page with category filter
+      router.push(`/shop-with-sidebar?categoryId=${categoryId}`)
+    } else {
+      // Navigate to shop page without filter (All Categories)
+      router.push('/shop-with-sidebar')
+    }
+  }
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      const params = new URLSearchParams()
+      params.set('search', searchQuery.trim())
+      if (selectedCategory) {
+        params.set('categoryId', selectedCategory)
+      }
+      router.push(`/shop-with-sidebar?${params.toString()}`)
+    } else if (selectedCategory) {
+      router.push(`/shop-with-sidebar?categoryId=${selectedCategory}`)
+    } else {
+      router.push('/shop-with-sidebar')
+    }
+  }
 
   return (
     <header
@@ -78,9 +111,13 @@ const Header = () => {
             </Link>
 
             <div className='max-w-[475px] w-full'>
-              <form>
+              <form onSubmit={handleSearch}>
                 <div className='flex items-center'>
-                  <CustomSelect options={options} />
+                  <CustomSelect 
+                    options={options} 
+                    value={selectedCategory}
+                    onChange={handleCategoryChange}
+                  />
 
                   <div className='relative max-w-[333px] sm:min-w-[333px] w-full'>
                     {/* <!-- divider --> */}
