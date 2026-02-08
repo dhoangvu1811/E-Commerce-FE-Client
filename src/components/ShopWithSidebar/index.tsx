@@ -20,6 +20,7 @@ import Pagination from '../Common/Pagination'
 const ShopWithSidebar = () => {
   const searchParams = useSearchParams()
   const categoryIdParam = searchParams.get('categoryId')
+  const searchParam = searchParams.get('search')
 
   const dispatch = useAppDispatch()
   const { products, loading, pagination } = useAppSelector(
@@ -36,18 +37,26 @@ const ShopWithSidebar = () => {
 
   const { register, watch, handleSubmit, setValue } = useForm({
     defaultValues: {
-      search: '',
+      search: searchParam || '',
       categoryId: categoryIdParam || undefined,
-      sort: 'createdAt_desc'
+      sort: 'newest'
     }
   })
 
-  // Sync URL param if it changes later (optional but good)
+  // Sync URL params if they change
   useEffect(() => {
     if (categoryIdParam) {
       setValue('categoryId', categoryIdParam)
+    } else {
+      setValue('categoryId', undefined)
     }
-  }, [categoryIdParam, setValue])
+    
+    if (searchParam) {
+      setValue('search', searchParam)
+    } else {
+      setValue('search', '')
+    }
+  }, [categoryIdParam, searchParam, setValue])
 
   const filterValues = watch()
 
@@ -57,10 +66,12 @@ const ShopWithSidebar = () => {
   }, [filterValues.categoryId, filterValues.sort, filterValues.search])
 
   useEffect(() => {
-    dispatch(fetchCategories())
+    dispatch(fetchCategories(undefined))
   }, [dispatch])
 
   useEffect(() => {
+    const searchValue = filterValues.search?.trim() || undefined
+    
     dispatch(
       fetchProducts({
         page: page,
@@ -68,10 +79,11 @@ const ShopWithSidebar = () => {
         /* @ts-ignore */
         categoryId: filterValues.categoryId,
         /* @ts-ignore */
-        sort: filterValues.sort
+        sort: filterValues.sort,
+        search: searchValue
       })
     )
-  }, [dispatch, page, filterValues.categoryId, filterValues.sort])
+  }, [dispatch, page, filterValues.categoryId, filterValues.sort, filterValues.search])
 
   const handleStickyMenu = () => {
     if (window.scrollY >= 80) {
@@ -82,9 +94,12 @@ const ShopWithSidebar = () => {
   }
 
   const options = [
-    { label: 'Latest Products', value: 'createdAt_desc' },
+    { label: 'Latest Products', value: 'newest' },
     { label: 'Price: Low to High', value: 'price_asc' },
-    { label: 'Price: High to Low', value: 'price_desc' }
+    { label: 'Price: High to Low', value: 'price_desc' },
+    { label: 'Name: A-Z', value: 'name_asc' },
+    { label: 'Name: Z-A', value: 'name_desc' },
+    { label: 'Highest Rating', value: 'rating' }
   ]
 
   /* Mock data for untyped dropdowns for now to prevent breaking UI */

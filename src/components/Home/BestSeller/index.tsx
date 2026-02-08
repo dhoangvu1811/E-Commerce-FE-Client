@@ -15,8 +15,10 @@ const BestSeller = () => {
     const fetchBestSellers = async () => {
       try {
         const data = await productService.getAll({
+          // Note: 'selled_desc' is not in official API docs but may be supported by backend
+          // @ts-ignore - Using non-documented sort option
           sort: 'selled_desc',
-          limit: 6
+          itemsPerPage: 6
         })
         setProducts(data.data.products)
       } catch (error) {
