@@ -51,15 +51,19 @@ export interface Product {
 // =========================================
 
 export interface ProductFilters extends SearchParams {
-  categoryId?: string // Category name
+  categoryId?: number | string
   sort?:
     | 'price_asc'
     | 'price_desc'
-    | 'rating_desc'
     | 'name_asc'
     | 'name_desc'
-    | 'selled_desc'
-    | 'createdAt_desc'
+    | 'newest'
+    | 'oldest'
+    | 'rating'
+}
+
+export interface CategoryFilters extends SearchParams {
+  // Filters specific to categories
 }
 
 // =========================================
@@ -88,6 +92,12 @@ export interface ProductCategoryResponse {
     categories: Category[]
     pagination: PaginationInfo
   }
+}
+
+export interface CategoryDetailResponse {
+  code: number
+  message: string
+  data: Category
 }
 
 // =========================================
