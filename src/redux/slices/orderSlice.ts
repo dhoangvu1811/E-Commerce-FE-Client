@@ -18,9 +18,11 @@ const initialState: OrderState = {
   error: null,
   pagination: {
     page: 1,
-    limit: 10,
-    total: 0,
-    totalPages: 0
+    itemsPerPage: 10,
+    totalItems: 0,
+    totalPages: 0,
+    hasNextPage: false,
+    hasPrevPage: false
   }
 }
 

@@ -21,7 +21,7 @@ const ShopWithoutSidebar = () => {
 
   const { register, watch } = useForm({
     defaultValues: {
-      sort: 'createdAt_desc'
+      sort: 'newest'
     }
   })
 
@@ -58,12 +58,13 @@ const ShopWithoutSidebar = () => {
   }
 
   const options = [
-    { label: 'Latest Products', value: 'createdAt_desc' },
-    { label: 'Best Selling', value: 'selled_desc' },
-    { label: 'Top Rated', value: 'rating_desc' },
+    { label: 'Latest Products', value: 'newest' },
     { label: 'Price: Low to High', value: 'price_asc' },
     { label: 'Price: High to Low', value: 'price_desc' },
-    { label: 'Name: A-Z', value: 'name_asc' }
+    { label: 'Name: A-Z', value: 'name_asc' },
+    { label: 'Name: Z-A', value: 'name_desc' },
+    { label: 'Highest Rating', value: 'rating' },
+    { label: 'Oldest', value: 'oldest' }
   ]
 
   return (
@@ -101,7 +102,7 @@ const ShopWithoutSidebar = () => {
                     <p>
                       Showing{' '}
                       <span className='text-dark'>
-                        {products.length} of {pagination.total}
+                        {products.length} of {pagination.totalItems}
                       </span>{' '}
                       Products
                     </p>

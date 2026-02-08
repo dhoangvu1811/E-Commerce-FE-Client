@@ -15,8 +15,8 @@ const NewArrival = () => {
     const fetchNewArrivals = async () => {
       try {
         const data = await productService.getAll({
-          sort: 'createdAt_desc',
-          limit: 8
+          sort: 'newest',
+          itemsPerPage: 8
         })
         setProducts(data.data.products)
       } catch (error) {

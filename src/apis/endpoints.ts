@@ -5,7 +5,6 @@ export const API_ENDPOINTS = {
   // Product Management
   PRODUCTS: {
     ALL: '/products/getAll',
-    GET_ALL_CATEGORIES: '/products/get-all-categories',
     DETAILS: (id: number | string) => `/products/details/${id}`
   },
 
