@@ -14,6 +14,7 @@ import { formatCurrency } from '@/utils/formatCurrency'
 
 import { fetchCategories } from '@/redux/slices/categorySlice'
 import { fetchProfile, logout } from '@/redux/slices/authSlice'
+import toast from 'react-hot-toast'
 
 const Header = () => {
   const router = useRouter()
@@ -50,6 +51,16 @@ const Header = () => {
   useEffect(() => {
     window.addEventListener('scroll', handleStickyMenu)
   })
+
+  const handleLogout = async () => {
+    try {
+      await dispatch(logout()).unwrap()
+      toast.success('Đăng xuất thành công')
+      router.push('/')
+    } catch (error: any) {
+      // Error handled by axios interceptor
+    }
+  }
 
   const options = [
     { label: 'All Categories', value: '' },
@@ -232,7 +243,7 @@ const Header = () => {
                       </div>
                     </Link>
                     <button
-                      onClick={() => dispatch(logout())}
+                      onClick={handleLogout}
                       className='text-dark hover:text-red ease-out duration-200'
                       title='Logout'
                     >
