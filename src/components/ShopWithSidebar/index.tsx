@@ -4,9 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Breadcrumb from '../Common/Breadcrumb'
 import CustomSelect from './CustomSelect'
 import CategoryDropdown from './CategoryDropdown'
-import GenderDropdown from './GenderDropdown'
-import SizeDropdown from './SizeDropdown'
-import ColorsDropdwon from './ColorsDropdwon'
+// Removed unused imports: GenderDropdown, SizeDropdown, ColorsDropdwon
 import PriceDropdown from './PriceDropdown'
 import SingleGridItem from '../Shop/SingleGridItem'
 import SingleListItem from '../Shop/SingleListItem'
@@ -43,6 +41,20 @@ const ShopWithSidebar = () => {
     }
   })
 
+  const [priceRange, setPriceRange] = useState<{ min: number; max: number } | undefined>(undefined)
+  // Key to force re-render PriceDropdown on reset
+  const [resetKey, setResetKey] = useState(0)
+
+  // Debounce price update to avoid too many API calls
+  const [debouncedPriceRange, setDebouncedPriceRange] = useState(priceRange)
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedPriceRange(priceRange)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [priceRange])
+
   // Sync URL params if they change
   useEffect(() => {
     if (categoryIdParam) {
@@ -63,7 +75,7 @@ const ShopWithSidebar = () => {
   // Reset page when filters change
   useEffect(() => {
     setPage(1)
-  }, [filterValues.categoryId, filterValues.sort, filterValues.search])
+  }, [filterValues.categoryId, filterValues.sort, filterValues.search, debouncedPriceRange])
 
   useEffect(() => {
     dispatch(fetchCategories(undefined))
@@ -80,10 +92,12 @@ const ShopWithSidebar = () => {
         categoryId: filterValues.categoryId,
         /* @ts-ignore */
         sort: filterValues.sort,
-        search: searchValue
+        search: searchValue,
+        minPrice: debouncedPriceRange?.min,
+        maxPrice: debouncedPriceRange?.max
       })
     )
-  }, [dispatch, page, filterValues.categoryId, filterValues.sort, filterValues.search])
+  }, [dispatch, page, filterValues.categoryId, filterValues.sort, filterValues.search, debouncedPriceRange])
 
   const handleStickyMenu = () => {
     if (window.scrollY >= 80) {
@@ -159,7 +173,17 @@ const ShopWithSidebar = () => {
                   <div className='bg-white shadow-1 rounded-lg py-4 px-5'>
                     <div className='flex items-center justify-between'>
                       <p>Filters:</p>
-                      <button className='text-blue' type='reset'>
+                      <button 
+                        className='text-blue' 
+                        type='button'
+                        onClick={() => {
+                          setValue('search', '')
+                          setValue('categoryId', undefined)
+                          setValue('sort', 'newest')
+                          setPriceRange(undefined)
+                          setResetKey(prev => prev + 1)
+                        }}
+                      >
                         Clean All
                       </button>
                     </div>
@@ -183,17 +207,15 @@ const ShopWithSidebar = () => {
                     </div>
                   </div>
 
-                  {/* <!-- gender box --> */}
-                  <GenderDropdown genders={genders} />
-
-                  {/* // <!-- size box --> */}
-                  <SizeDropdown />
-
-                  {/* // <!-- color box --> */}
-                  <ColorsDropdwon />
+                  {/* <!-- gender box: REMOVED as unsupported --> */}
+                  {/* <!-- size box: REMOVED as unsupported --> */}
+                  {/* <!-- color box: REMOVED as unsupported --> */}
 
                   {/* // <!-- price range box --> */}
-                  <PriceDropdown />
+                  <PriceDropdown 
+                    key={resetKey} // Force reset when key changes
+                    onChange={(val) => setPriceRange(val)} 
+                  />
                 </div>
               </form>
             </div>

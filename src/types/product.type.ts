@@ -59,7 +59,11 @@ export interface ProductFilters extends SearchParams {
     | 'name_desc'
     | 'newest'
     | 'oldest'
+    | 'newest'
+    | 'oldest'
     | 'rating'
+  minPrice?: number
+  maxPrice?: number
 }
 
 export interface CategoryFilters extends SearchParams {

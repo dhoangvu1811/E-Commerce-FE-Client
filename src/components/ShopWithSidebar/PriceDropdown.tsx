@@ -3,13 +3,28 @@ import { useState } from 'react'
 import RangeSlider from 'react-range-slider-input'
 import 'react-range-slider-input/dist/style.css'
 
-const PriceDropdown = () => {
+const PriceDropdown = ({
+  onChange
+}: {
+  onChange: (value: { min: number; max: number }) => void
+}) => {
   const [toggleDropdown, setToggleDropdown] = useState(true)
 
   const [selectedPrice, setSelectedPrice] = useState({
     from: 0,
-    to: 100
+    to: 50000000
   })
+
+  const handleInput = (e: number[]) => {
+    const newVal = {
+      from: Math.floor(e[0]),
+      to: Math.ceil(e[1])
+    }
+    setSelectedPrice(newVal)
+    if (onChange) {
+      onChange({ min: newVal.from, max: newVal.to })
+    }
+  }
 
   return (
     <div className='bg-white shadow-1 rounded-lg'>
@@ -52,12 +67,10 @@ const PriceDropdown = () => {
               id='range-slider-gradient'
               className='margin-lg'
               step={'any'}
-              onInput={(e) =>
-                setSelectedPrice({
-                  from: Math.floor(e[0]),
-                  to: Math.ceil(e[1])
-                })
-              }
+              min={0}
+              max={50000000}
+              value={[selectedPrice.from, selectedPrice.to]}
+              onInput={handleInput}
             />
 
             <div className='price-amount flex items-center justify-between pt-4'>
@@ -65,18 +78,36 @@ const PriceDropdown = () => {
                 <span className='block border-r border-gray-3/80 px-2.5 py-1.5'>
                   ₫
                 </span>
-                <span id='minAmount' className='block px-3 py-1.5'>
-                  {selectedPrice.from}
-                </span>
+                <input
+                  type='number'
+                  value={selectedPrice.from}
+                  onChange={(e) => {
+                    const val = Number(e.target.value)
+                    const newVal = { ...selectedPrice, from: val }
+                    setSelectedPrice(newVal)
+                    onChange && onChange({ min: newVal.from, max: newVal.to })
+                  }}
+                  className='block w-full px-3 py-1.5 outline-none'
+                  placeholder='Min'
+                />
               </div>
 
               <div className='text-custom-xs text-dark-4 flex rounded border border-gray-3/80'>
                 <span className='block border-r border-gray-3/80 px-2.5 py-1.5'>
                   ₫
                 </span>
-                <span id='maxAmount' className='block px-3 py-1.5'>
-                  {selectedPrice.to}
-                </span>
+                <input
+                  type='number'
+                  value={selectedPrice.to}
+                  onChange={(e) => {
+                    const val = Number(e.target.value)
+                    const newVal = { ...selectedPrice, to: val }
+                    setSelectedPrice(newVal)
+                    onChange && onChange({ min: newVal.from, max: newVal.to })
+                  }}
+                  className='block w-full px-3 py-1.5 outline-none'
+                  placeholder='Max'
+                />
               </div>
             </div>
           </div>
