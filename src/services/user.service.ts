@@ -5,7 +5,9 @@ import {
   ChangePasswordRequest,
   RevokeSessionRequest,
   SessionInfo,
+  SessionsResponse,
   UpdateProfileRequest,
+  UploadAvatarResponse,
   User
 } from '@/types/auth.type'
 
@@ -51,7 +53,7 @@ export const userService = {
   },
 
   getMySessions: async () => {
-    return await axiosInstance.get<ApiResponse<SessionInfo[]>>(
+    return await axiosInstance.get<ApiResponse<SessionsResponse>>(
       API_ENDPOINTS.USER.MY_SESSIONS
     )
   },
@@ -60,6 +62,21 @@ export const userService = {
     return await axiosInstance.post<ApiResponse<void>>(
       API_ENDPOINTS.USER.REVOKE_SESSION,
       data
+    )
+  },
+
+  uploadAvatar: async (file: File) => {
+    const formData = new FormData()
+    formData.append('avatar', file)
+
+    return await axiosInstance.post<ApiResponse<UploadAvatarResponse>>(
+      API_ENDPOINTS.USER.UPLOAD_AVATAR,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }
     )
   }
 }

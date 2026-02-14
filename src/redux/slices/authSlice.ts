@@ -6,9 +6,12 @@ import {
   RegisterRequest,
   User,
   ChangePasswordRequest,
-  UpdateProfileRequest
+  UpdateProfileRequest,
+  SendVerificationEmailRequest,
+  VerifyAccountRequest,
+  SessionsResponse,
+  RevokeSessionRequest
 } from '@/types/auth.type'
-import toast from 'react-hot-toast'
 
 interface AuthState {
   user: User | null
@@ -107,6 +110,71 @@ export const changePassword = createAsyncThunk(
   }
 )
 
+export const sendVerificationEmail = createAsyncThunk(
+  'auth/sendVerificationEmail',
+  async (data: SendVerificationEmailRequest, { rejectWithValue }) => {
+    try {
+      const response = await authService.sendVerificationEmail(data)
+      return response.data.data
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Gửi email xác thực thất bại'
+      return rejectWithValue(message)
+    }
+  }
+)
+
+export const verifyAccount = createAsyncThunk(
+  'auth/verifyAccount',
+  async (data: VerifyAccountRequest, { rejectWithValue }) => {
+    try {
+      const response = await authService.verifyAccount(data)
+      return response.data.data
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Xác minh tài khoản thất bại'
+      return rejectWithValue(message)
+    }
+  }
+)
+
+export const uploadAvatar = createAsyncThunk(
+  'auth/uploadAvatar',
+  async (file: File, { rejectWithValue }) => {
+    try {
+      const response = await userService.uploadAvatar(file)
+      return response.data.data
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Upload ảnh thất bại'
+      return rejectWithValue(message)
+    }
+  }
+)
+
+export const fetchMySessions = createAsyncThunk(
+  'auth/fetchMySessions',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await userService.getMySessions()
+      return response.data.data
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Lấy danh sách phiên đăng nhập thất bại'
+      return rejectWithValue(message)
+    }
+  }
+)
+
+export const revokeMySession = createAsyncThunk(
+  'auth/revokeMySession',
+  async (data: RevokeSessionRequest, { rejectWithValue }) => {
+    try {
+      await userService.revokeSession(data)
+      return data.sessionId
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Thu hồi phiên đăng nhập thất bại'
+      return rejectWithValue(message)
+    }
+  }
+)
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -155,7 +223,6 @@ const authSlice = createSlice({
       .addCase(logout.fulfilled, (state) => {
         state.user = null
         state.isAuthenticated = false
-        toast.success('Đăng xuất thành công')
       })
 
       // Fetch Profile

@@ -5,6 +5,8 @@ import {
   AuthResponse,
   LoginRequest,
   RegisterRequest,
+  SendVerificationEmailRequest,
+  VerifyAccountRequest,
   User
 } from '@/types/auth.type'
 
@@ -32,6 +34,20 @@ export const authService = {
   refreshToken: async () => {
     return await axiosInstance.post<ApiResponse<void>>(
       API_ENDPOINTS.AUTH.REFRESH_TOKEN
+    )
+  },
+
+  sendVerificationEmail: async (data: SendVerificationEmailRequest) => {
+    return await axiosInstance.post<ApiResponse<{ email: string; expiresIn: string }>>(
+      API_ENDPOINTS.AUTH.SEND_VERIFICATION_EMAIL,
+      data
+    )
+  },
+
+  verifyAccount: async (params: VerifyAccountRequest) => {
+    return await axiosInstance.get<ApiResponse<User>>(
+      API_ENDPOINTS.AUTH.VERIFY_ACCOUNT,
+      { params }
     )
   }
 }
