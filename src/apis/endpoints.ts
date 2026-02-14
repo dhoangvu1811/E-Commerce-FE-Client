@@ -20,12 +20,17 @@ export const API_ENDPOINTS = {
     LOGIN: '/users/login',
     LOGOUT: '/users/logout',
     REFRESH_TOKEN: '/users/refresh-token',
+    SEND_VERIFICATION_EMAIL: '/users/send-verification-email',
+    VERIFY_ACCOUNT: '/users/verify-account',
     GOOGLE: '/users/auth/google',
-    FACEBOOK: '/users/auth/facebook'
+    GOOGLE_CALLBACK: '/users/auth/google/callback',
+    FACEBOOK: '/users/auth/facebook',
+    FACEBOOK_CALLBACK: '/users/auth/facebook/callback'
   },
   USER: {
     PROFILE: '/users/me',
     CHANGE_PASSWORD: '/users/me/password',
+    UPLOAD_AVATAR: '/users/upload-avatar',
     MY_SESSIONS: '/users/my-sessions',
     REVOKE_SESSION: '/users/revoke-my-session'
   },

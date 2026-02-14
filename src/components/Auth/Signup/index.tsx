@@ -1,7 +1,7 @@
 'use client'
 import Breadcrumb from '@/components/Common/Breadcrumb'
 import Link from 'next/link'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm, SubmitHandler } from 'react-hook-form'
 import { useRouter } from 'next/navigation'
 import { useAppDispatch, useAppSelector } from '@/redux/store'
@@ -13,20 +13,40 @@ const Signup = () => {
   const router = useRouter()
   const dispatch = useAppDispatch()
   const { loading, error } = useAppSelector((state) => state.authReducer)
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors }
   } = useForm<RegisterRequest>()
 
   const onSubmit: SubmitHandler<RegisterRequest> = async (data) => {
-    const resultAction = await dispatch(registerUser(data))
-    if (registerUser.fulfilled.match(resultAction)) {
-      toast.success('Account created successfully! Please login.')
-      router.push('/signin')
+    try {
+      await dispatch(registerUser(data)).unwrap()
+      toast.success(
+        'Account created successfully! Please check your email to verify your account.',
+        { duration: 5000 }
+      )
+      router.push('/resend-verification')
+    } catch (error: any) {
+      // Error toast handled by axios interceptor
+      reset()
     }
+  }
+
+  // OAuth handlers
+  const handleGoogleLogin = () => {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8017/V1'
+    window.location.href = `${baseUrl}/users/auth/google`
+  }
+
+  const handleFacebookLogin = () => {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8017/V1'
+    window.location.href = `${baseUrl}/users/auth/facebook`
   }
 
   const password = watch('password')
@@ -47,6 +67,7 @@ const Signup = () => {
             <div className='flex flex-col gap-4.5'>
               <button
                 type='button'
+                onClick={handleGoogleLogin}
                 className='flex justify-center items-center gap-3.5 rounded-lg border border-gray-3 bg-gray-1 p-3 ease-out duration-200 hover:bg-gray-2'
               >
                 <svg
@@ -97,21 +118,22 @@ const Signup = () => {
 
               <button
                 type='button'
+                onClick={handleFacebookLogin}
                 className='flex justify-center items-center gap-3.5 rounded-lg border border-gray-3 bg-gray-1 p-3 ease-out duration-200 hover:bg-gray-2'
               >
                 <svg
-                  width='22'
-                  height='22'
-                  viewBox='0 0 22 22'
+                  width='20'
+                  height='20'
+                  viewBox='0 0 20 20'
                   fill='none'
                   xmlns='http://www.w3.org/2000/svg'
                 >
                   <path
-                    d='M10.9997 1.83331C5.93773 1.83331 1.83301 6.04119 1.83301 11.232C1.83301 15.3847 4.45954 18.9077 8.10178 20.1505C8.55988 20.2375 8.72811 19.9466 8.72811 19.6983C8.72811 19.4743 8.71956 18.7338 8.71567 17.9485C6.16541 18.517 5.6273 16.8395 5.6273 16.8395C5.21032 15.7532 4.60951 15.4644 4.60951 15.4644C3.77785 14.8811 4.6722 14.893 4.6722 14.893C5.59272 14.9593 6.07742 15.8615 6.07742 15.8615C6.89499 17.2984 8.22184 16.883 8.74493 16.6429C8.82718 16.0353 9.06478 15.6208 9.32694 15.3861C7.2909 15.1484 5.15051 14.3425 5.15051 10.7412C5.15051 9.71509 5.5086 8.87661 6.09503 8.21844C5.99984 7.98167 5.68611 7.02577 6.18382 5.73115C6.18382 5.73115 6.95358 5.47855 8.70532 6.69458C9.43648 6.48627 10.2207 6.3819 10.9997 6.37836C11.7787 6.3819 12.5635 6.48627 13.2961 6.69458C15.0457 5.47855 15.8145 5.73115 15.8145 5.73115C16.3134 7.02577 15.9995 7.98167 15.9043 8.21844C16.4921 8.87661 16.8477 9.715 16.8477 10.7412C16.8477 14.351 14.7033 15.146 12.662 15.3786C12.9909 15.6702 13.2838 16.2423 13.2838 17.1191C13.2838 18.3766 13.2732 19.3888 13.2732 19.6983C13.2732 19.9485 13.4382 20.2415 13.9028 20.1492C17.5431 18.905 20.1663 15.3833 20.1663 11.232C20.1663 6.04119 16.0621 1.83331 10.9997 1.83331Z'
-                    fill='#15171A'
+                    d='M20 10C20 4.47715 15.5229 0 10 0C4.47715 0 0 4.47715 0 10C0 14.9912 3.65684 19.1283 8.4375 19.8785V12.8906H5.89844V10H8.4375V7.79688C8.4375 5.29063 9.93047 3.90625 12.2146 3.90625C13.3084 3.90625 14.4531 4.10156 14.4531 4.10156V6.5625H13.1922C11.95 6.5625 11.5625 7.3334 11.5625 8.125V10H14.3359L13.8926 12.8906H11.5625V19.8785C16.3432 19.1283 20 14.9912 20 10Z'
+                    fill='#1877F2'
                   />
                 </svg>
-                Sign Up with Github
+                Sign Up with Facebook
               </button>
             </div>
 
@@ -146,11 +168,20 @@ const Signup = () => {
 
                   <input
                     type='email'
-                    name='email'
                     id='email'
                     placeholder='Enter your email address'
+                    {...register('email', {
+                      required: 'Email is required',
+                      pattern: {
+                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                        message: 'Invalid email address'
+                      }
+                    })}
                     className='rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20'
                   />
+                  {errors.email && (
+                    <span className='text-red text-sm'>{errors.email.message}</span>
+                  )}
                 </div>
 
                 <div className='mb-5'>
@@ -158,29 +189,95 @@ const Signup = () => {
                     Password <span className='text-red'>*</span>
                   </label>
 
-                  <input
-                    type='password'
-                    name='password'
-                    id='password'
-                    placeholder='Enter your password'
-                    autoComplete='on'
-                    className='rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20'
-                  />
+                  <div className='relative'>
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      id='password'
+                      placeholder='Enter your password'
+                      autoComplete='on'
+                      {...register('password', {
+                        required: 'Password is required',
+                        minLength: {
+                          value: 8,
+                          message: 'Password must be at least 8 characters'
+                        },
+                        pattern: {
+                          value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/,
+                          message: 'Password must contain uppercase, lowercase, and number'
+                        }
+                      })}
+                      className='rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 pr-12 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20'
+                    />
+                    <button
+                      type='button'
+                      onClick={() => setShowPassword(!showPassword)}
+                      className='absolute right-4 top-1/2 -translate-y-1/2 text-gray-5 hover:text-dark'
+                    >
+                      {showPassword ? (
+                        <svg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                          <path d='M12.9833 10C12.9833 11.6499 11.6499 12.9833 10 12.9833C8.35009 12.9833 7.01666 11.6499 7.01666 10C7.01666 8.35009 8.35009 7.01666 10 7.01666C11.6499 7.01666 12.9833 8.35009 12.9833 10Z' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                          <path d='M9.99999 16.8916C12.9417 16.8916 15.6833 15.1583 17.5917 12.1583C18.3417 10.9833 18.3417 9.00831 17.5917 7.83331C15.6833 4.83331 12.9417 3.09998 9.99999 3.09998C7.05833 3.09998 4.31666 4.83331 2.40833 7.83331C1.65833 9.00831 1.65833 10.9833 2.40833 12.1583C4.31666 15.1583 7.05833 16.8916 9.99999 16.8916Z' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                        </svg>
+                      ) : (
+                        <svg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                          <path d='M12.1083 7.89166L7.89166 12.1083C7.34999 11.5667 7.01666 10.825 7.01666 10C7.01666 8.35 8.34999 7.01666 9.99999 7.01666C10.825 7.01666 11.5667 7.35 12.1083 7.89166Z' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                          <path d='M14.8417 4.80835C13.4917 3.71669 11.7833 3.10002 10 3.10002C7.05833 3.10002 4.31667 4.83335 2.40833 7.83335C1.65833 9.00835 1.65833 10.9834 2.40833 12.1584C3.06667 13.2 3.83333 14.0917 4.66667 14.8084' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                          <path d='M7.01666 16.275C7.96666 16.675 8.97499 16.8917 9.99999 16.8917C12.9417 16.8917 15.6833 15.1583 17.5917 12.1583C18.3417 10.9833 18.3417 9.00835 17.5917 7.83335C17.3167 7.40002 17.0167 6.99169 16.7083 6.60835' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                          <path d='M12.925 10.5833C12.7083 11.7583 11.75 12.7167 10.575 12.9333' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                          <path d='M7.89167 12.1083L1.66667 18.3333' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                          <path d='M18.3333 1.66669L12.1083 7.89169' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                  {errors.password && (
+                    <span className='text-red text-sm'>{errors.password.message}</span>
+                  )}
                 </div>
 
                 <div className='mb-5.5'>
-                  <label htmlFor='re-type-password' className='block mb-2.5'>
+                  <label htmlFor='confirmPassword' className='block mb-2.5'>
                     Re-type Password <span className='text-red'>*</span>
                   </label>
 
-                  <input
-                    type='password'
-                    name='re-type-password'
-                    id='re-type-password'
-                    placeholder='Re-type your password'
-                    autoComplete='on'
-                    className='rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20'
-                  />
+                  <div className='relative'>
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      id='confirmPassword'
+                      placeholder='Re-type your password'
+                      autoComplete='on'
+                      {...register('confirmPassword', {
+                        required: 'Please confirm your password',
+                        validate: (value) =>
+                          value === password || 'Passwords do not match'
+                      })}
+                      className='rounded-lg border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-3 px-5 pr-12 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20'
+                    />
+                    <button
+                      type='button'
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className='absolute right-4 top-1/2 -translate-y-1/2 text-gray-5 hover:text-dark'
+                    >
+                      {showConfirmPassword ? (
+                        <svg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                          <path d='M12.9833 10C12.9833 11.6499 11.6499 12.9833 10 12.9833C8.35009 12.9833 7.01666 11.6499 7.01666 10C7.01666 8.35009 8.35009 7.01666 10 7.01666C11.6499 7.01666 12.9833 8.35009 12.9833 10Z' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                          <path d='M9.99999 16.8916C12.9417 16.8916 15.6833 15.1583 17.5917 12.1583C18.3417 10.9833 18.3417 9.00831 17.5917 7.83331C15.6833 4.83331 12.9417 3.09998 9.99999 3.09998C7.05833 3.09998 4.31666 4.83331 2.40833 7.83331C1.65833 9.00831 1.65833 10.9833 2.40833 12.1583C4.31666 15.1583 7.05833 16.8916 9.99999 16.8916Z' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                        </svg>
+                      ) : (
+                        <svg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                          <path d='M12.1083 7.89166L7.89166 12.1083C7.34999 11.5667 7.01666 10.825 7.01666 10C7.01666 8.35 8.34999 7.01666 9.99999 7.01666C10.825 7.01666 11.5667 7.35 12.1083 7.89166Z' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                          <path d='M14.8417 4.80835C13.4917 3.71669 11.7833 3.10002 10 3.10002C7.05833 3.10002 4.31667 4.83335 2.40833 7.83335C1.65833 9.00835 1.65833 10.9834 2.40833 12.1584C3.06667 13.2 3.83333 14.0917 4.66667 14.8084' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                          <path d='M7.01666 16.275C7.96666 16.675 8.97499 16.8917 9.99999 16.8917C12.9417 16.8917 15.6833 15.1583 17.5917 12.1583C18.3417 10.9833 18.3417 9.00835 17.5917 7.83335C17.3167 7.40002 17.0167 6.99169 16.7083 6.60835' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                          <path d='M12.925 10.5833C12.7083 11.7583 11.75 12.7167 10.575 12.9333' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                          <path d='M7.89167 12.1083L1.66667 18.3333' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                          <path d='M18.3333 1.66669L12.1083 7.89169' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round'/>
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                  {errors.confirmPassword && (
+                    <span className='text-red text-sm'>{errors.confirmPassword.message}</span>
+                  )}
                 </div>
 
                 <button

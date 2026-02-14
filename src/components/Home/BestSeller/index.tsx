@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { productService } from '@/services'
 import { Product } from '@/types/product.type'
 import PreLoader from '@/components/Common/PreLoader'
+import toast from 'react-hot-toast'
 
 const BestSeller = () => {
   const [products, setProducts] = useState<Product[]>([])
@@ -23,6 +24,7 @@ const BestSeller = () => {
         setProducts(data.data.products)
       } catch (error) {
         console.error('Failed to fetch best sellers', error)
+        toast.error('Không thể tải sản phẩm bán chạy. Vui lòng thử lại.')
       } finally {
         setLoading(false)
       }

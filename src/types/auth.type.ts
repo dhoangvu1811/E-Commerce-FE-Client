@@ -2,12 +2,18 @@ export interface User {
   id: number
   name: string
   email: string
-  phone?: string
-  address?: string
-  avatar?: string
-  role?: string
-  createdAt?: string
-  updatedAt?: string
+  phoneNumber?: string | null
+  address?: string | null
+  avatar?: string | null
+  dateOfBirth?: string | null
+  gender?: 'male' | 'female' | 'other' | null
+  emailVerified: boolean
+  typeAccount: 'LOCAL' | 'GOOGLE' | 'FACEBOOK'
+  status: 'active' | 'inactive' | 'banned'
+  roleId: number
+  lastLogin?: string | null
+  createdAt: string
+  updatedAt: string
 }
 
 export interface AuthResponse {
@@ -26,9 +32,11 @@ export interface RegisterRequest {
   name: string
   email: string
   password: string
-  confirmPassword?: string
-  phone?: string
+  confirmPassword: string
+  phoneNumber?: string
   address?: string
+  dateOfBirth?: string
+  gender?: 'male' | 'female' | 'other'
 }
 
 export interface ChangePasswordRequest {
@@ -39,7 +47,7 @@ export interface ChangePasswordRequest {
 
 export interface UpdateProfileRequest {
   name?: string
-  phone?: string
+  phoneNumber?: string
   address?: string
   dateOfBirth?: string
   gender?: 'male' | 'female' | 'other'
@@ -52,7 +60,29 @@ export interface RevokeSessionRequest {
 
 export interface SessionInfo {
   sessionId: string
-  deviceName?: string
-  ipAddress?: string
-  createdAt?: string
+  deviceInfo: string
+  ipAddress: string
+  createdAt: string
+  expiresAt: string
+  isActive: boolean
+  isCurrent: boolean
+}
+
+export interface SessionsResponse {
+  sessions: SessionInfo[]
+  total: number
+}
+
+export interface SendVerificationEmailRequest {
+  email: string
+}
+
+export interface VerifyAccountRequest {
+  email: string
+  token: string
+}
+
+export interface UploadAvatarResponse {
+  avatarUrl: string
+  publicId: string
 }

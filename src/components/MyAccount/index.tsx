@@ -4,6 +4,7 @@ import Breadcrumb from '../Common/Breadcrumb'
 import Image from 'next/image'
 import AddressModal from './AddressModal'
 import Orders from '../Orders'
+import Sessions from './Sessions'
 import { useAppDispatch, useAppSelector } from '@/redux/store'
 import { logout, fetchProfile } from '@/redux/slices/authSlice'
 import { useRouter } from 'next/navigation'
@@ -22,10 +23,21 @@ const MyAccount = () => {
     dispatch(fetchProfile())
   }, [dispatch])
 
+  // Format member since date
+  const getMemberSince = () => {
+    if (!user?.createdAt) return 'Recently joined'
+    const date = new Date(user.createdAt)
+    return `Member Since ${date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`
+  }
+
   const handleLogout = async () => {
-    await dispatch(logout())
-    router.push('/signin')
-    toast.success('Logged out successfully')
+    try {
+      await dispatch(logout()).unwrap()
+      toast.success('Đăng xuất thành công')
+      router.push('/')
+    } catch (error: any) {
+      // Error toast handled by axios interceptor
+    }
   }
 
   const openAddressModal = () => {
@@ -49,8 +61,8 @@ const MyAccount = () => {
                 <div className='hidden lg:flex flex-wrap items-center gap-5 py-6 px-4 sm:px-7.5 xl:px-9 border-r xl:border-r-0 xl:border-b border-gray-3'>
                   <div className='max-w-[64px] w-full h-16 rounded-full overflow-hidden'>
                     <Image
-                      src='/images/users/user-04.jpg'
-                      alt='user'
+                      src={user?.avatar || '/images/users/user-04.jpg'}
+                      alt={user?.name || 'user'}
                       width={64}
                       height={64}
                     />
@@ -58,9 +70,9 @@ const MyAccount = () => {
 
                   <div>
                     <p className='font-medium text-dark mb-0.5'>
-                      James Septimus
+                      {user?.name || 'Guest User'}
                     </p>
-                    <p className='text-custom-xs'>Member Since Sep 2020</p>
+                    <p className='text-custom-xs'>{getMemberSince()}</p>
                   </div>
                 </div>
 
@@ -238,12 +250,52 @@ const MyAccount = () => {
                     </button>
 
                     <button
-                      onClick={() => setActiveTab('logout')}
+                      onClick={() => setActiveTab('sessions')}
                       className={`flex items-center rounded-md gap-2.5 py-3 px-4.5 ease-out duration-200 hover:bg-blue hover:text-white ${
-                        activeTab === 'logout'
+                        activeTab === 'sessions'
                           ? 'text-white bg-blue'
                           : 'text-dark-2 bg-gray-1'
                       }`}
+                    >
+                      <svg
+                        className='fill-current'
+                        width='22'
+                        height='22'
+                        viewBox='0 0 22 22'
+                        fill='none'
+                        xmlns='http://www.w3.org/2000/svg'
+                      >
+                        <path
+                          fillRule='evenodd'
+                          clipRule='evenodd'
+                          d='M6.41602 3.4375C4.74792 3.4375 3.39517 4.79025 3.39517 6.45835C3.39517 8.12645 4.74792 9.4792 6.41602 9.4792C8.08412 9.4792 9.43687 8.12645 9.43687 6.45835C9.43687 4.79025 8.08412 3.4375 6.41602 3.4375ZM4.77017 6.45835C4.77017 5.54964 5.50731 4.8125 6.41602 4.8125C7.32473 4.8125 8.06187 5.54964 8.06187 6.45835C8.06187 7.36706 7.32473 8.1042 6.41602 8.1042C5.50731 8.1042 4.77017 7.36706 4.77017 6.45835Z'
+                          fill=''
+                        />
+                        <path
+                          fillRule='evenodd'
+                          clipRule='evenodd'
+                          d='M5.48213 10.2562C4.49588 10.6068 3.7793 11.0927 3.29638 11.7306C2.81026 12.3724 2.60352 13.1152 2.60352 13.9792C2.60352 14.3589 2.91133 14.6667 3.29102 14.6667C3.67071 14.6667 3.97852 14.3589 3.97852 13.9792C3.97852 13.3773 4.11058 12.936 4.36029 12.6018C4.61319 12.2636 5.03355 11.9682 5.78213 11.6896C6.5307 11.411 7.54055 11.1771 8.79102 11.1771C10.0415 11.1771 11.0513 11.411 11.7999 11.6896C12.5485 11.9682 12.9688 12.2636 13.2217 12.6018C13.4714 12.936 13.6035 13.3773 13.6035 13.9792C13.6035 14.3589 13.9113 14.6667 14.291 14.6667C14.6707 14.6667 14.9785 14.3589 14.9785 13.9792C14.9785 13.1152 14.7718 12.3724 14.2856 11.7306C13.8027 11.0927 13.0861 10.6068 12.0999 10.2562C11.1177 9.90764 9.92305 9.80212 8.79102 9.80212C7.65898 9.80212 6.46436 9.90764 5.48213 10.2562Z'
+                          fill=''
+                        />
+                        <path
+                          fillRule='evenodd'
+                          clipRule='evenodd'
+                          d='M15.584 9.16669C14.7544 9.16669 14.0827 9.83839 14.0827 10.668C14.0827 11.4976 14.7544 12.1693 15.584 12.1693C16.4136 12.1693 17.0852 11.4976 17.0852 10.668C17.0852 9.83839 16.4136 9.16669 15.584 9.16669ZM12.7077 10.668C12.7077 9.07901 14.0051 7.78169 15.594 7.78169C17.1829 7.78169 18.4802 9.07901 18.4802 10.668C18.4802 12.2569 17.1829 13.5542 15.594 13.5542C14.0051 13.5542 12.7077 12.2569 12.7077 10.668Z'
+                          fill=''
+                        />
+                        <path
+                          fillRule='evenodd'
+                          clipRule='evenodd'
+                          d='M14.7456 14.2396C14.9878 14.0512 15.3398 14.0942 15.5282 14.3364C15.7929 14.6731 16.1399 14.9023 16.5248 15.0527C16.9097 15.2031 17.3273 15.2713 17.7465 15.2523C18.1257 15.2346 18.4428 15.5334 18.4605 15.9126C18.4782 16.2918 18.1794 16.6089 17.8002 16.6266C17.195 16.6524 16.5915 16.5557 16.0237 16.3424C15.4558 16.1291 14.9361 15.8039 14.4976 15.3866C14.3092 15.1444 14.3522 14.7924 14.5944 14.604Z'
+                          fill=''
+                        />
+                      </svg>
+                      Active Sessions
+                    </button>
+
+                    <button
+                      onClick={handleLogout}
+                      className='flex items-center rounded-md gap-2.5 py-3 px-4.5 ease-out duration-200 hover:bg-red hover:text-white text-dark-2 bg-gray-1'
                     >
                       <svg
                         className='fill-current'
@@ -280,13 +332,13 @@ const MyAccount = () => {
               }`}
             >
               <p className='text-dark'>
-                Hello Annie (not Annie?
-                <a
-                  href='#'
+                Hello {user?.name || 'Guest'} (not {user?.name || 'you'}?{' '}
+                <button
+                  onClick={handleLogout}
                   className='text-red ease-out duration-200 hover:underline'
                 >
                   Log Out
-                </a>
+                </button>
                 )
               </p>
 
@@ -376,7 +428,7 @@ const MyAccount = () => {
                           fill=''
                         />
                       </svg>
-                      Name: James Septimus
+                      Name: {user?.name || 'Not provided'}
                     </p>
 
                     <p className='flex items-center gap-2.5 text-custom-sm'>
@@ -395,7 +447,7 @@ const MyAccount = () => {
                           fill=''
                         />
                       </svg>
-                      Email: jamse@example.com
+                      Email: {user?.email || 'Not provided'}
                     </p>
 
                     <p className='flex items-center gap-2.5 text-custom-sm'>
@@ -424,7 +476,7 @@ const MyAccount = () => {
                           fill=''
                         />
                       </svg>
-                      Phone: 1234 567890
+                      Phone: {user?.phoneNumber || 'Not provided'}
                     </p>
 
                     <p className='flex gap-2.5 text-custom-sm'>
@@ -450,7 +502,7 @@ const MyAccount = () => {
                           </clipPath>
                         </defs>
                       </svg>
-                      Address: 7398 Smoke Ranch RoadLas Vegas, Nevada 89128
+                      Address: {user?.address || 'Not provided'}
                     </p>
                   </div>
                 </div>
@@ -508,7 +560,7 @@ const MyAccount = () => {
                           fill=''
                         />
                       </svg>
-                      Name: James Septimus
+                      Name: {user?.name || 'Not provided'}
                     </p>
 
                     <p className='flex items-center gap-2.5 text-custom-sm'>
@@ -527,7 +579,7 @@ const MyAccount = () => {
                           fill=''
                         />
                       </svg>
-                      Email: jamse@example.com
+                      Email: {user?.email || 'Not provided'}
                     </p>
 
                     <p className='flex items-center gap-2.5 text-custom-sm'>
@@ -556,7 +608,7 @@ const MyAccount = () => {
                           fill=''
                         />
                       </svg>
-                      Phone: 1234 567890
+                      Phone: {user?.phoneNumber || 'Not provided'}
                     </p>
 
                     <p className='flex gap-2.5 text-custom-sm'>
@@ -582,7 +634,7 @@ const MyAccount = () => {
                           </clipPath>
                         </defs>
                       </svg>
-                      Address: 7398 Smoke Ranch RoadLas Vegas, Nevada 89128
+                      Address: {user?.address || 'Not provided'}
                     </p>
                   </div>
                 </div>
@@ -599,7 +651,15 @@ const MyAccount = () => {
               <AccountDetails />
             </div>
             {/* <!-- details tab content end -->
-          <!--== user dashboard content end ==--> */}
+          <!-- sessions tab content start --> */}
+            <div
+              className={`xl:max-w-[770px] w-full ${
+                activeTab === 'sessions' ? 'block' : 'hidden'
+              }`}
+            >
+              <Sessions />
+            </div>
+            {/* <!-- sessions tab content end -->          <!--== user dashboard content end ==--> */}
           </div>
         </div>
       </section>
