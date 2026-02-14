@@ -31,7 +31,7 @@ const Signup = () => {
         'Account created successfully! Please check your email to verify your account.',
         { duration: 5000 }
       )
-      router.push('/resend-verification')
+      router.push('/signin')
     } catch (error: any) {
       // Error toast handled by axios interceptor
       reset()

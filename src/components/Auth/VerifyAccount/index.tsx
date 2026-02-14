@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useAppDispatch } from '@/redux/store'
 import { verifyAccount } from '@/redux/slices/authSlice'
@@ -14,6 +14,7 @@ const VerifyAccount = () => {
   
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = useState('')
+  const verifyAttempted = useRef(false)
 
   useEffect(() => {
     const email = searchParams.get('email')
@@ -24,6 +25,9 @@ const VerifyAccount = () => {
       setMessage('Invalid verification link. Email and token are required.')
       return
     }
+
+    if (verifyAttempted.current) return
+    verifyAttempted.current = true
 
     const verify = async () => {
       try {
