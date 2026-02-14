@@ -6,6 +6,7 @@ import ProductItem from '@/components/Common/ProductItem'
 import { productService } from '@/services'
 import { Product } from '@/types/product.type'
 import PreLoader from '@/components/Common/PreLoader'
+import toast from 'react-hot-toast'
 
 const NewArrival = () => {
   const [products, setProducts] = useState<Product[]>([])
@@ -21,6 +22,7 @@ const NewArrival = () => {
         setProducts(data.data.products)
       } catch (error) {
         console.error('Failed to fetch new arrivals', error)
+        toast.error('Không thể tải sản phẩm mới. Vui lòng thử lại.')
       } finally {
         setLoading(false)
       }

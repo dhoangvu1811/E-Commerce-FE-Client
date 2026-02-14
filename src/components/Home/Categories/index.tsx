@@ -7,8 +7,8 @@ import { fetchCategories } from '@/redux/slices/categorySlice'
 import PreLoader from '@/components/Common/PreLoader'
 
 // Import Swiper styles
-// import 'swiper/css/navigation'
-// import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css'
 
 const Categories = () => {
   const dispatch = useAppDispatch()
