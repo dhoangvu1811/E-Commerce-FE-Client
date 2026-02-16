@@ -34,10 +34,23 @@ export const API_ENDPOINTS = {
     MY_SESSIONS: '/users/my-sessions',
     REVOKE_SESSION: '/users/revoke-my-session'
   },
+
+  // Order Management
   ORDERS: {
+    CREATE: '/orders/create',
     MY_ORDERS: '/orders/my-orders',
-    DETAILS: '/orders/details/:id',
-    CANCEL: '/orders/cancel/:id'
+    DETAILS: (id: number | string) => `/orders/details/${id}`,
+    CANCEL: (id: number | string) => `/orders/cancel/${id}`
+  },
+
+  // Shipping Address Management
+  SHIPPING_ADDRESSES: {
+    LIST: '/shipping-addresses',
+    CREATE: '/shipping-addresses',
+    DETAIL: (id: number) => `/shipping-addresses/${id}`,
+    UPDATE: (id: number) => `/shipping-addresses/${id}`,
+    DELETE: (id: number) => `/shipping-addresses/${id}`,
+    SET_DEFAULT: (id: number) => `/shipping-addresses/${id}/default`
   }
 } as const
 
