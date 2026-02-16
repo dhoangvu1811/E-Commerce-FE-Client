@@ -1,12 +1,14 @@
 'use client'
 import React, { useState, useEffect } from 'react'
+
+import { useForm } from 'react-hook-form'
+
 import Breadcrumb from '../Common/Breadcrumb'
 
 import SingleGridItem from '../Shop/SingleGridItem'
 import SingleListItem from '../Shop/SingleListItem'
 import { useAppDispatch, useAppSelector } from '@/redux/store'
 import { fetchProducts } from '@/redux/slices/productsSlice'
-import { useForm } from 'react-hook-form'
 import PreLoader from '../Common/PreLoader'
 import Pagination from '../Common/Pagination'
 
@@ -15,6 +17,7 @@ const ShopWithoutSidebar = () => {
   const [page, setPage] = useState(1)
 
   const dispatch = useAppDispatch()
+
   const { products, loading, pagination } = useAppSelector(
     (state) => state.productsReducer
   )
@@ -37,6 +40,7 @@ const ShopWithoutSidebar = () => {
       fetchProducts({
         page,
         itemsPerPage: 12,
+
         /* @ts-ignore */
         sort: sortValue
       })
@@ -46,6 +50,7 @@ const ShopWithoutSidebar = () => {
   {
     /* <!-- Products Pagination Start --> */
   }
+
   ;<div className='flex justify-center mt-15'>
     <Pagination
       currentPage={page}
@@ -53,6 +58,7 @@ const ShopWithoutSidebar = () => {
       onPageChange={(page) => setPage(page)}
     />
   </div>
+
   {
     /* <!-- Products Pagination End --> */
   }

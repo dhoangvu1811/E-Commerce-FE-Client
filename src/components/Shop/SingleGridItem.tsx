@@ -1,15 +1,20 @@
 'use client'
 import React from 'react'
+
+import Link from 'next/link'
+
+import Image from 'next/image'
+
+import { useDispatch } from 'react-redux'
+
 import { formatCurrency } from '@/utils/formatCurrency'
-import { Product } from '@/types/product.type'
+import type { Product } from '@/types/product.type'
 import { useModalContext } from '@/app/context/QuickViewModalContext'
 import { updateQuickView } from '@/redux/slices/quickViewSlice'
 import { addItemToCart } from '@/redux/slices/cartSlice'
 import { addItemToWishlist } from '@/redux/slices/wishlistSlice'
-import { useDispatch } from 'react-redux'
-import { AppDispatch } from '@/redux/store'
-import Link from 'next/link'
-import Image from 'next/image'
+import type { AppDispatch } from '@/redux/store'
+
 
 const SingleGridItem = ({ item }: { item: Product }) => {
   const { openModal } = useModalContext()

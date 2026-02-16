@@ -1,10 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { useForm, SubmitHandler } from 'react-hook-form'
+
+import Image from 'next/image'
+
+import type { SubmitHandler } from 'react-hook-form';
+import { useForm } from 'react-hook-form'
+
+import toast from 'react-hot-toast'
+
 import { useAppDispatch, useAppSelector } from '@/redux/store'
 import { updateProfile, changePassword, uploadAvatar, fetchProfile } from '@/redux/slices/authSlice'
-import { UpdateProfileRequest, ChangePasswordRequest } from '@/types/auth.type'
-import toast from 'react-hot-toast'
-import Image from 'next/image'
+import type { UpdateProfileRequest, ChangePasswordRequest } from '@/types/auth.type'
 
 const AccountDetails = () => {
   const dispatch = useAppDispatch()
@@ -74,6 +79,8 @@ const AccountDetails = () => {
       await dispatch(changePassword(data)).unwrap()
       toast.success('Đổi mật khẩu thành công')
       resetPassword()
+
+
       // Re-fetch profile to update typeAccount (OAuth → LOCAL) in Redux state
       // This may fail if sessions were revoked (expected behavior for password change)
       try {
@@ -89,29 +96,35 @@ const AccountDetails = () => {
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
+
     if (!file) return
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
       toast.error('Please select an image file')
-      return
+      
+return
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast.error('Image size must be less than 5MB')
-      return
+      
+return
     }
 
     // Preview
     const reader = new FileReader()
+
     reader.onloadend = () => {
       setAvatarPreview(reader.result as string)
     }
+
     reader.readAsDataURL(file)
 
     // Upload
     setUploadingAvatar(true)
+
     try {
       await dispatch(uploadAvatar(file)).unwrap()
       toast.success('Avatar uploaded successfully')

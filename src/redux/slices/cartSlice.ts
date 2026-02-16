@@ -1,5 +1,7 @@
-import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { RootState } from '../store'
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSelector, createSlice } from '@reduxjs/toolkit'
+
+import type { RootState } from '../store'
 
 type InitialState = {
   cartItems: CartItem[]
@@ -25,6 +27,7 @@ export const cart = createSlice({
     addItemToCart: (state, action: PayloadAction<CartItem>) => {
       const { id, name, price, quantity, discountedPrice, image } =
         action.payload
+
       const existingItem = state.cartItems.find((item) => item.id === id)
 
       if (existingItem) {
@@ -42,6 +45,7 @@ export const cart = createSlice({
     },
     removeItemFromCart: (state, action: PayloadAction<number>) => {
       const itemId = action.payload
+
       state.cartItems = state.cartItems.filter((item) => item.id !== itemId)
     },
     updateCartItemQuantity: (

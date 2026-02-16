@@ -67,6 +67,7 @@ export interface ProductFilters extends SearchParams {
 }
 
 export interface CategoryFilters extends SearchParams {
+
   // Filters specific to categories
 }
 

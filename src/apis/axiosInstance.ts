@@ -122,6 +122,7 @@ axiosInstance.interceptors.response.use(
      */
     if (error.response?.status === 401) {
       const shouldRedirect = !originalRequest?._skipRedirect
+
       dispatchLogout(shouldRedirect)
 
       return Promise.reject(error)

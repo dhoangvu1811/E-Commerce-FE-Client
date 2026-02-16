@@ -1,14 +1,34 @@
 'use client'
 import React from 'react'
-import Discount from './Discount'
-import OrderSummary from './OrderSummary'
-import { useAppSelector } from '@/redux/store'
-import SingleItem from './SingleItem'
-import Breadcrumb from '../Common/Breadcrumb'
+
 import Link from 'next/link'
 
+import toast from 'react-hot-toast'
+
+import Discount from './Discount'
+import OrderSummary from './OrderSummary'
+import { useAppSelector , useAppDispatch } from '@/redux/store'
+import SingleItem from './SingleItem'
+import Breadcrumb from '../Common/Breadcrumb'
+import ConfirmationModal from '../Common/ConfirmationModal'
+
+import { removeAllItemsFromCart } from '@/redux/slices/cartSlice'
+
+
 const Cart = () => {
+  const dispatch = useAppDispatch()
   const cartItems = useAppSelector((state) => state.cartReducer.cartItems)
+  const [showClearCartConfirm, setShowClearCartConfirm] = React.useState(false)
+
+  const handleClearCartClick = () => {
+    setShowClearCartConfirm(true)
+  }
+
+  const handleConfirmClearCart = () => {
+    dispatch(removeAllItemsFromCart())
+    toast.success('Đã xóa giỏ hàng')
+    setShowClearCartConfirm(false)
+  }
 
   return (
     <>
@@ -22,7 +42,12 @@ const Cart = () => {
           <div className='max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0'>
             <div className='flex flex-wrap items-center justify-between gap-5 mb-7.5'>
               <h2 className='font-medium text-dark text-2xl'>Your Cart</h2>
-              <button className='text-blue'>Clear Shopping Cart</button>
+              <button 
+                onClick={handleClearCartClick}
+                className='text-blue hover:text-blue-dark transition-colors'
+              >
+                Clear Shopping Cart
+              </button>
             </div>
 
             <div className='bg-white rounded-[10px] shadow-1'>
@@ -111,6 +136,17 @@ const Cart = () => {
           </div>
         </>
       )}
+
+      <ConfirmationModal
+        isOpen={showClearCartConfirm}
+        title='Xóa giỏ hàng'
+        message='Bạn có chắc chắn muốn xóa toàn bộ sản phẩm trong giỏ hàng không?'
+        onConfirm={handleConfirmClearCart}
+        onCancel={() => setShowClearCartConfirm(false)}
+        confirmText='Xóa'
+        cancelText='Hủy'
+        isDanger={true}
+      />
     </>
   )
 }

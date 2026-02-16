@@ -1,4 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit'
 
 type InitialState = {
   wishlistItems: WishListItem[]
@@ -25,6 +26,7 @@ export const wishlist = createSlice({
     addItemToWishlist: (state, action: PayloadAction<WishListItem>) => {
       const { id, name, price, quantity, image, discountedPrice, status } =
         action.payload
+
       const existingItem = state.wishlistItems.find((item) => item.id === id)
 
       if (existingItem) {
@@ -43,6 +45,7 @@ export const wishlist = createSlice({
     },
     removeItemFromWishlist: (state, action: PayloadAction<number>) => {
       const itemId = action.payload
+
       state.wishlistItems = state.wishlistItems.filter(
         (item) => item.id !== itemId
       )

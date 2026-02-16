@@ -1,7 +1,9 @@
-import { Category } from '@/types/product.type'
 import React from 'react'
+
 import Image from 'next/image'
 import Link from 'next/link'
+
+import type { Category } from '@/types/product.type'
 
 const SingleItem = ({ item }: { item: Category }) => {
   return (

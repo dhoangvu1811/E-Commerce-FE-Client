@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+
 import { productService } from '@/services'
-import { Product } from '@/types/product.type'
+import type { Product } from '@/types/product.type'
 
 interface ProductDetailsState {
   item: Product | null
@@ -19,7 +20,9 @@ export const fetchProductDetails = createAsyncThunk(
   async (id: number, { rejectWithValue }) => {
     try {
       const data = await productService.getById(id)
-      return data.data
+
+      
+return data.data
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Failed to fetch product details'

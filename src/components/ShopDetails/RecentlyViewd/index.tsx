@@ -1,12 +1,13 @@
 "use client";
-import React from "react";
-import shopData from "@/components/Shop/shopData";
-import ProductItem from "@/components/Common/ProductItem";
+import React, { useCallback, useRef } from "react";
+
 import Image from "next/image";
 import Link from "next/link";
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import { useCallback, useRef } from "react";
+
+import ProductItem from "@/components/Common/ProductItem";
+import shopData from "@/components/Shop/shopData";
 import "swiper/css/navigation";
 import "swiper/css";
 

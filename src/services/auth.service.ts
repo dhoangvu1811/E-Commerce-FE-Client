@@ -1,7 +1,7 @@
 import axiosInstance from '@/apis/axiosInstance'
 import { API_ENDPOINTS } from '@/apis/endpoints'
-import { ApiResponse } from '@/types/api.type'
-import {
+import type { ApiResponse } from '@/types/api.type'
+import type {
   AuthResponse,
   LoginRequest,
   RegisterRequest,

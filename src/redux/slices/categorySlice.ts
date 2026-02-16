@@ -1,7 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+
 import { productService } from '@/services'
-import { Category, CategoryFilters } from '@/types/product.type'
-import { PaginationInfo } from '@/types/api.type'
+import type { Category, CategoryFilters } from '@/types/product.type'
+import type { PaginationInfo } from '@/types/api.type'
 
 interface CategoryState {
   categories: Category[]
@@ -33,7 +34,9 @@ export const fetchCategories = createAsyncThunk(
   async (params: CategoryFilters | undefined, { rejectWithValue }) => {
     try {
       const response = await productService.getAllCategories(params)
-      return response.data
+
+      
+return response.data
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Failed to fetch categories'
@@ -47,7 +50,9 @@ export const fetchCategoryById = createAsyncThunk(
   async (id: number | string, { rejectWithValue }) => {
     try {
       const response = await productService.getCategoryById(id)
-      return response.data
+
+      
+return response.data
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Failed to fetch category'
@@ -66,6 +71,7 @@ export const categorySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+
       // Fetch all categories
       .addCase(fetchCategories.pending, (state) => {
         state.loading = true
@@ -80,6 +86,7 @@ export const categorySlice = createSlice({
         state.loading = false
         state.error = action.payload as string
       })
+
       // Fetch category by ID
       .addCase(fetchCategoryById.pending, (state) => {
         state.loadingDetail = true

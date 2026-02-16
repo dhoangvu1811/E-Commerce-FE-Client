@@ -1,12 +1,17 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import Breadcrumb from '../Common/Breadcrumb'
+
 import Image from 'next/image'
+
+import { useSearchParams } from 'next/navigation'
+
+import Breadcrumb from '../Common/Breadcrumb'
 import Newsletter from '../Common/Newsletter'
 import RecentlyViewdItems from './RecentlyViewd'
 import { usePreviewSlider } from '@/app/context/PreviewSliderContext'
 import { useAppDispatch, useAppSelector } from '@/redux/store'
-import { useSearchParams } from 'next/navigation'
+
+
 import { fetchProductDetails } from '@/redux/slices/productDetailsSlice'
 import PreLoader from '../Common/PreLoader'
 import { formatCurrency } from '@/utils/formatCurrency'

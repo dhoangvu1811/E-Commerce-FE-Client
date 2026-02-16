@@ -1,12 +1,15 @@
 import React from 'react'
-import { formatCurrency } from '@/utils/formatCurrency'
-import { AppDispatch } from '@/redux/store'
+
+import Image from 'next/image'
+
 import { useDispatch } from 'react-redux'
+
+import { formatCurrency } from '@/utils/formatCurrency'
+import type { AppDispatch } from '@/redux/store'
 
 import { removeItemFromWishlist } from '@/redux/slices/wishlistSlice'
 import { addItemToCart } from '@/redux/slices/cartSlice'
 
-import Image from 'next/image'
 
 const SingleItem = ({ item }) => {
   const dispatch = useDispatch<AppDispatch>()

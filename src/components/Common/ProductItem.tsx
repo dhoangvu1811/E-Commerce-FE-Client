@@ -1,15 +1,21 @@
 'use client'
 import React from 'react'
+
 import Image from 'next/image'
-import { Product } from '@/types/product.type'
+
+import Link from 'next/link'
+
+import { useDispatch } from 'react-redux'
+
+import type { Product } from '@/types/product.type'
 import { useModalContext } from '@/app/context/QuickViewModalContext'
 import { updateQuickView } from '@/redux/slices/quickViewSlice'
 import { addItemToCart } from '@/redux/slices/cartSlice'
 import { addItemToWishlist } from '@/redux/slices/wishlistSlice'
 import { setProductDetails } from '@/redux/slices/productDetailsSlice'
-import { useDispatch } from 'react-redux'
-import { AppDispatch } from '@/redux/store'
-import Link from 'next/link'
+import type { AppDispatch } from '@/redux/store'
+
+
 import { formatCurrency } from '@/utils/formatCurrency'
 
 const ProductItem = ({ item }: { item: Product }) => {

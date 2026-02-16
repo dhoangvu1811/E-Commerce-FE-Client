@@ -1,7 +1,9 @@
 import React from "react";
+
+import Image from "next/image";
+
 import HeroCarousel from "./HeroCarousel";
 import HeroFeature from "./HeroFeature";
-import Image from "next/image";
 
 const Hero = () => {
   return (

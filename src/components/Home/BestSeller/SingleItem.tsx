@@ -1,13 +1,19 @@
 'use client'
 import React from 'react'
-import { Product } from '@/types/product.type'
-import { useModalContext } from '@/app/context/QuickViewModalContext'
+
+import Image from 'next/image'
+
+import Link from 'next/link'
+
 import { useDispatch } from 'react-redux'
-import { AppDispatch } from '@/redux/store'
+
+import type { Product } from '@/types/product.type'
+import { useModalContext } from '@/app/context/QuickViewModalContext'
+import type { AppDispatch } from '@/redux/store'
 import { updateQuickView } from '@/redux/slices/quickViewSlice'
 import { addItemToCart } from '@/redux/slices/cartSlice'
-import Image from 'next/image'
-import Link from 'next/link'
+
+
 import { addItemToWishlist } from '@/redux/slices/wishlistSlice'
 import { formatCurrency } from '@/utils/formatCurrency'
 

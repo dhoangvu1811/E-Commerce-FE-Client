@@ -1,12 +1,17 @@
 'use client'
 import React, { useEffect, useState } from 'react'
+
+import Image from 'next/image'
+
+import { useDispatch } from 'react-redux'
+
 import { formatCurrency } from '@/utils/formatCurrency'
 
 import { useModalContext } from '@/app/context/QuickViewModalContext'
-import { AppDispatch, useAppSelector } from '@/redux/store'
+import type { AppDispatch} from '@/redux/store';
+import { useAppSelector } from '@/redux/store'
 import { addItemToCart } from '@/redux/slices/cartSlice'
-import { useDispatch } from 'react-redux'
-import Image from 'next/image'
+
 import { usePreviewSlider } from '@/app/context/PreviewSliderContext'
 import { resetQuickView } from '@/redux/slices/quickViewSlice'
 import { setProductDetails } from '@/redux/slices/productDetailsSlice'
