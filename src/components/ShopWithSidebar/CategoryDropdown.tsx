@@ -4,7 +4,9 @@ import { useState } from "react";
 
 const CategoryItem = ({ category }) => {
   const [selected, setSelected] = useState(false);
-  return (
+
+  
+return (
     <button
       className={`${
         selected && "text-blue"

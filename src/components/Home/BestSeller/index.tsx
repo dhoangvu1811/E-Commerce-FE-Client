@@ -1,12 +1,18 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import SingleItem from './SingleItem'
+
 import Image from 'next/image'
+
 import Link from 'next/link'
-import { productService } from '@/services'
-import { Product } from '@/types/product.type'
-import PreLoader from '@/components/Common/PreLoader'
+
 import toast from 'react-hot-toast'
+
+import SingleItem from './SingleItem'
+
+import { productService } from '@/services'
+import type { Product } from '@/types/product.type'
+import PreLoader from '@/components/Common/PreLoader'
+
 
 const BestSeller = () => {
   const [products, setProducts] = useState<Product[]>([])
@@ -21,6 +27,7 @@ const BestSeller = () => {
           sort: 'selled_desc',
           itemsPerPage: 6
         })
+
         setProducts(data.data.products)
       } catch (error) {
         console.error('Failed to fetch best sellers', error)
@@ -29,6 +36,7 @@ const BestSeller = () => {
         setLoading(false)
       }
     }
+
     fetchBestSellers()
   }, [])
 

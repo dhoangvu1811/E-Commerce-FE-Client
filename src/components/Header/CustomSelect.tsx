@@ -19,6 +19,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   placeholder 
 }) => {
   const [isOpen, setIsOpen] = useState(false)
+
   const [selectedOption, setSelectedOption] = useState<Option>(
     value 
       ? options.find(opt => opt.value === value) || options[0]
@@ -29,6 +30,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   useEffect(() => {
     if (value !== undefined) {
       const option = options.find(opt => opt.value === value)
+
       if (option) {
         setSelectedOption(option)
       }
@@ -42,6 +44,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   const handleOptionClick = (option: Option) => {
     setSelectedOption(option)
     setIsOpen(false)
+
+
     // Call onChange callback if provided
     if (onChange) {
       onChange(option.value)

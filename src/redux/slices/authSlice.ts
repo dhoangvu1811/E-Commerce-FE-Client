@@ -1,7 +1,8 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+
 import { authService } from '@/services/auth.service'
 import { userService } from '@/services/user.service'
-import {
+import type {
   LoginRequest,
   RegisterRequest,
   User,
@@ -9,7 +10,6 @@ import {
   UpdateProfileRequest,
   SendVerificationEmailRequest,
   VerifyAccountRequest,
-  SessionsResponse,
   RevokeSessionRequest
 } from '@/types/auth.type'
 
@@ -33,7 +33,9 @@ export const login = createAsyncThunk(
   async (data: LoginRequest, { rejectWithValue }) => {
     try {
       const response = await authService.login(data)
-      return response.data.data
+
+      
+return response.data.data
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Đăng nhập thất bại'
@@ -47,7 +49,9 @@ export const register = createAsyncThunk(
   async (data: RegisterRequest, { rejectWithValue }) => {
     try {
       const response = await authService.register(data)
-      return response.data.data
+
+      
+return response.data.data
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Đăng ký thất bại'
@@ -74,7 +78,9 @@ export const fetchProfile = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await userService.getProfile()
-      return response.data.data
+
+      
+return response.data.data
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Lấy thông tin người dùng thất bại'
@@ -88,7 +94,9 @@ export const updateProfile = createAsyncThunk(
   async (data: UpdateProfileRequest, { rejectWithValue }) => {
     try {
       const response = await userService.updateProfile(data)
-      return response.data.data
+
+      
+return response.data.data
     } catch (error: any) {
       return rejectWithValue(
         error.response?.data?.message || 'Cập nhật thông tin thất bại'
@@ -115,10 +123,14 @@ export const sendVerificationEmail = createAsyncThunk(
   async (data: SendVerificationEmailRequest, { rejectWithValue }) => {
     try {
       const response = await authService.sendVerificationEmail(data)
-      return response.data.data
+
+      
+return response.data.data
     } catch (error: any) {
       const message = error.response?.data?.message || 'Gửi email xác thực thất bại'
-      return rejectWithValue(message)
+
+      
+return rejectWithValue(message)
     }
   }
 )
@@ -128,10 +140,14 @@ export const verifyAccount = createAsyncThunk(
   async (data: VerifyAccountRequest, { rejectWithValue }) => {
     try {
       const response = await authService.verifyAccount(data)
-      return response.data.data
+
+      
+return response.data.data
     } catch (error: any) {
       const message = error.response?.data?.message || 'Xác minh tài khoản thất bại'
-      return rejectWithValue(message)
+
+      
+return rejectWithValue(message)
     }
   }
 )
@@ -141,10 +157,14 @@ export const uploadAvatar = createAsyncThunk(
   async (file: File, { rejectWithValue }) => {
     try {
       const response = await userService.uploadAvatar(file)
-      return response.data.data
+
+      
+return response.data.data
     } catch (error: any) {
       const message = error.response?.data?.message || 'Upload ảnh thất bại'
-      return rejectWithValue(message)
+
+      
+return rejectWithValue(message)
     }
   }
 )
@@ -154,10 +174,14 @@ export const fetchMySessions = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await userService.getMySessions()
-      return response.data.data
+
+      
+return response.data.data
     } catch (error: any) {
       const message = error.response?.data?.message || 'Lấy danh sách phiên đăng nhập thất bại'
-      return rejectWithValue(message)
+
+      
+return rejectWithValue(message)
     }
   }
 )
@@ -167,10 +191,13 @@ export const revokeMySession = createAsyncThunk(
   async (data: RevokeSessionRequest, { rejectWithValue }) => {
     try {
       await userService.revokeSession(data)
-      return data.sessionId
+      
+return data.sessionId
     } catch (error: any) {
       const message = error.response?.data?.message || 'Thu hồi phiên đăng nhập thất bại'
-      return rejectWithValue(message)
+
+      
+return rejectWithValue(message)
     }
   }
 )
@@ -187,6 +214,7 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+
       // Login
       .addCase(login.pending, (state) => {
         state.loading = true
@@ -209,6 +237,7 @@ const authSlice = createSlice({
       })
       .addCase(register.fulfilled, (state) => {
         state.loading = false
+
         // Usually register doesn't auto-login or returns user?
         // API Doc says returns User.
         // Assuming we redirect to login or auto-login.

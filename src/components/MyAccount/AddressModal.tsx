@@ -1,125 +1,289 @@
 'use client'
-import { useAppSelector } from '@/redux/store'
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 
-const AddressModal = ({ isOpen, closeModal }) => {
-  const { user } = useAppSelector((state) => state.authReducer)
+import toast from 'react-hot-toast'
+
+import { useAppDispatch } from '@/redux/store'
+import {
+  createAddress,
+  updateAddress
+} from '@/redux/slices/shippingAddressSlice'
+import type {
+  ShippingAddressItem,
+  CreateShippingAddressPayload,
+  UpdateShippingAddressPayload
+} from '@/types/shippingAddress.type'
+
+interface AddressModalProps {
+  isOpen: boolean
+  onClose: () => void
+  editAddress: ShippingAddressItem | null
+  onSuccess: () => void
+}
+
+const AddressModal = ({
+  isOpen,
+  onClose,
+  editAddress,
+  onSuccess
+}: AddressModalProps) => {
+  const dispatch = useAppDispatch()
+  const isEditing = !!editAddress
+
+  const [form, setForm] = useState({
+    fullName: '',
+    phone: '',
+    address: '',
+    city: '',
+    province: '',
+    postalCode: '',
+    isDefault: false
+  })
+
+  const [submitting, setSubmitting] = useState(false)
+
+  // Populate form when editing
   useEffect(() => {
-    // closing modal while clicking outside
-    function handleClickOutside(event) {
-      if (!event.target.closest('.modal-content')) {
-        closeModal()
+    if (editAddress) {
+      setForm({
+        fullName: editAddress.fullName,
+        phone: editAddress.phone,
+        address: editAddress.address,
+        city: editAddress.city,
+        province: editAddress.province,
+        postalCode: editAddress.postalCode || '',
+        isDefault: editAddress.isDefault
+      })
+    } else {
+      setForm({
+        fullName: '',
+        phone: '',
+        address: '',
+        city: '',
+        province: '',
+        postalCode: '',
+        isDefault: false
+      })
+    }
+  }, [editAddress, isOpen])
+
+  const handleChange = (field: string, value: string | boolean) => {
+    setForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // Validate
+    if (!form.fullName.trim()) return toast.error('Vui lòng nhập họ tên')
+    if (!form.phone.trim()) return toast.error('Vui lòng nhập số điện thoại')
+    if (!form.address.trim()) return toast.error('Vui lòng nhập địa chỉ')
+    if (!form.city.trim()) return toast.error('Vui lòng nhập thành phố')
+    if (!form.province.trim()) return toast.error('Vui lòng nhập tỉnh/thành')
+
+    setSubmitting(true)
+
+    try {
+      if (isEditing) {
+        const payload: UpdateShippingAddressPayload = {
+          fullName: form.fullName.trim(),
+          phone: form.phone.trim(),
+          address: form.address.trim(),
+          city: form.city.trim(),
+          province: form.province.trim(),
+          postalCode: form.postalCode.trim() || undefined,
+          isDefault: form.isDefault
+        }
+
+        await dispatch(
+          updateAddress({ id: editAddress!.id, payload })
+        ).unwrap()
+        toast.success('Cập nhật địa chỉ thành công')
+      } else {
+        const payload: CreateShippingAddressPayload = {
+          fullName: form.fullName.trim(),
+          phone: form.phone.trim(),
+          address: form.address.trim(),
+          city: form.city.trim(),
+          province: form.province.trim(),
+          postalCode: form.postalCode.trim() || undefined,
+          isDefault: form.isDefault
+        }
+
+        await dispatch(createAddress(payload)).unwrap()
+        toast.success('Thêm địa chỉ thành công')
       }
-    }
 
-    if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
+      onSuccess()
+    } catch (err: any) {
+      toast.error(err || 'Có lỗi xảy ra')
+    } finally {
+      setSubmitting(false)
     }
+  }
 
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [isOpen, closeModal])
+  if (!isOpen) return null
+
+  const inputClass =
+    'rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-2.5 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20'
 
   return (
-    <div
-      className={`fixed top-0 left-0 overflow-y-auto no-scrollbar w-full h-screen sm:py-20 xl:py-25 2xl:py-[230px] bg-dark/70 sm:px-8 px-4 py-5 ${
-        isOpen ? 'block z-99999' : 'hidden'
-      }`}
-    >
-      <div className='flex items-center justify-center '>
-        <div
-          x-show='addressModal'
-          className='w-full max-w-[1100px] rounded-xl shadow-3 bg-white p-7.5 relative modal-content'
-        >
+    <div className='fixed top-0 left-0 overflow-y-auto no-scrollbar w-full h-screen sm:py-20 xl:py-25 2xl:py-[230px] bg-dark/70 sm:px-8 px-4 py-5 z-99999'>
+      <div className='flex items-center justify-center'>
+        <div className='w-full max-w-[600px] rounded-xl shadow-3 bg-white p-7.5 relative modal-content'>
+          {/* Close button */}
           <button
-            onClick={closeModal}
-            aria-label='button for close modal'
-            className='absolute top-0 right-0 sm:top-3 sm:right-3 flex items-center justify-center w-10 h-10 rounded-full ease-in duration-150 bg-meta text-body hover:text-dark'
+            onClick={onClose}
+            aria-label='Đóng modal'
+            className='absolute top-3 right-3 flex items-center justify-center w-10 h-10 rounded-full ease-in duration-150 bg-meta text-body hover:text-dark'
           >
             <svg
-              className='fill-current'
-              width='26'
-              height='26'
-              viewBox='0 0 26 26'
+              width='20'
+              height='20'
+              viewBox='0 0 20 20'
               fill='none'
               xmlns='http://www.w3.org/2000/svg'
             >
               <path
-                fillRule='evenodd'
-                clipRule='evenodd'
-                d='M14.3108 13L19.2291 8.08167C19.5866 7.72417 19.5866 7.12833 19.2291 6.77083C19.0543 6.59895 18.8189 6.50262 18.5737 6.50262C18.3285 6.50262 18.0932 6.59895 17.9183 6.77083L13 11.6892L8.08164 6.77083C7.90679 6.59895 7.67142 6.50262 7.42623 6.50262C7.18104 6.50262 6.94566 6.59895 6.77081 6.77083C6.41331 7.12833 6.41331 7.72417 6.77081 8.08167L11.6891 13L6.77081 17.9183C6.41331 18.2758 6.41331 18.8717 6.77081 19.2292C7.12831 19.5867 7.72414 19.5867 8.08164 19.2292L13 14.3108L17.9183 19.2292C18.2758 19.5867 18.8716 19.5867 19.2291 19.2292C19.5866 18.8717 19.5866 18.2758 19.2291 17.9183L14.3108 13Z'
-                fill=''
+                d='M15 5L5 15M5 5L15 15'
+                stroke='currentColor'
+                strokeWidth='2'
+                strokeLinecap='round'
               />
             </svg>
           </button>
 
-          <div>
-            <form>
-              <div className='flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5'>
-                <div className='w-full'>
-                  <label htmlFor='name' className='block mb-2.5'>
-                    Name
-                  </label>
+          <h3 className='font-medium text-xl text-dark mb-6'>
+            {isEditing ? 'Sửa địa chỉ' : 'Thêm địa chỉ mới'}
+          </h3>
 
-                  <input
-                    type='text'
-                    name='name'
-                    defaultValue={user?.name || ''}
-                    className='rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-2.5 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20'
-                  />
-                </div>
-
-                <div className='w-full'>
-                  <label htmlFor='email' className='block mb-2.5'>
-                    Email
-                  </label>
-
-                  <input
-                    type='email'
-                    name='email'
-                    defaultValue={user?.email || ''}
-                    className='rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-2.5 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20'
-                  />
-                </div>
+          <form onSubmit={handleSubmit}>
+            <div className='flex flex-col lg:flex-row gap-5 mb-5'>
+              <div className='w-full'>
+                <label htmlFor='addressFullName' className='block mb-2'>
+                  Họ và tên <span className='text-red'>*</span>
+                </label>
+                <input
+                  type='text'
+                  id='addressFullName'
+                  placeholder='Nhập họ và tên'
+                  value={form.fullName}
+                  onChange={(e) => handleChange('fullName', e.target.value)}
+                  className={inputClass}
+                />
               </div>
 
-              <div className='flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5'>
-                <div className='w-full'>
-                  <label htmlFor='phone' className='block mb-2.5'>
-                    Phone
-                  </label>
+              <div className='w-full'>
+                <label htmlFor='addressPhone' className='block mb-2'>
+                  Số điện thoại <span className='text-red'>*</span>
+                </label>
+                <input
+                  type='tel'
+                  id='addressPhone'
+                  placeholder='Nhập số điện thoại'
+                  value={form.phone}
+                  onChange={(e) => handleChange('phone', e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+            </div>
 
-                  <input
-                    type='text'
-                    name='phone'
-                    defaultValue={user?.phoneNumber || ''}
-                    className='rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-2.5 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20'
-                  />
-                </div>
+            <div className='mb-5'>
+              <label htmlFor='addressDetail' className='block mb-2'>
+                Địa chỉ chi tiết <span className='text-red'>*</span>
+              </label>
+              <input
+                type='text'
+                id='addressDetail'
+                placeholder='Số nhà, tên đường, phường/xã'
+                value={form.address}
+                onChange={(e) => handleChange('address', e.target.value)}
+                className={inputClass}
+              />
+            </div>
 
-                <div className='w-full'>
-                  <label htmlFor='address' className='block mb-2.5'>
-                    Address
-                  </label>
-
-                  <input
-                    type='text'
-                    name='address'
-                    defaultValue={user?.address || ''}
-                    className='rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-2.5 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20'
-                  />
-                </div>
+            <div className='flex flex-col lg:flex-row gap-5 mb-5'>
+              <div className='w-full'>
+                <label htmlFor='addressCity' className='block mb-2'>
+                  Thành phố <span className='text-red'>*</span>
+                </label>
+                <input
+                  type='text'
+                  id='addressCity'
+                  placeholder='Nhập thành phố'
+                  value={form.city}
+                  onChange={(e) => handleChange('city', e.target.value)}
+                  className={inputClass}
+                />
               </div>
 
+              <div className='w-full'>
+                <label htmlFor='addressProvince' className='block mb-2'>
+                  Tỉnh/Thành <span className='text-red'>*</span>
+                </label>
+                <input
+                  type='text'
+                  id='addressProvince'
+                  placeholder='Nhập tỉnh/thành'
+                  value={form.province}
+                  onChange={(e) => handleChange('province', e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            <div className='mb-5'>
+              <label htmlFor='addressPostalCode' className='block mb-2'>
+                Mã bưu chính{' '}
+                <span className='text-dark-5 text-sm'>(không bắt buộc)</span>
+              </label>
+              <input
+                type='text'
+                id='addressPostalCode'
+                placeholder='Nhập mã bưu chính'
+                value={form.postalCode}
+                onChange={(e) => handleChange('postalCode', e.target.value)}
+                className={inputClass}
+              />
+            </div>
+
+            {/* Default checkbox */}
+            <div className='mb-6'>
+              <label className='flex items-center gap-3 cursor-pointer'>
+                <input
+                  type='checkbox'
+                  checked={form.isDefault}
+                  onChange={(e) => handleChange('isDefault', e.target.checked)}
+                  className='w-4.5 h-4.5 rounded border-gray-3 text-blue focus:ring-blue'
+                  disabled={isEditing && editAddress?.isDefault}
+                />
+                <span className='text-dark text-sm'>
+                  Đặt làm địa chỉ mặc định
+                </span>
+              </label>
+            </div>
+
+            <div className='flex items-center gap-3'>
               <button
                 type='submit'
-                className='inline-flex font-medium text-white bg-blue py-3 px-7 rounded-md ease-out duration-200 hover:bg-blue-dark'
+                disabled={submitting}
+                className='inline-flex font-medium text-white bg-blue py-3 px-7 rounded-md ease-out duration-200 hover:bg-blue-dark disabled:opacity-50 disabled:cursor-not-allowed'
               >
-                Save Changes
+                {submitting
+                  ? 'Đang lưu...'
+                  : isEditing
+                    ? 'Cập nhật'
+                    : 'Thêm địa chỉ'}
               </button>
-            </form>
-          </div>
+              <button
+                type='button'
+                onClick={onClose}
+                className='inline-flex font-medium text-dark bg-gray-1 py-3 px-7 rounded-md ease-out duration-200 hover:bg-gray-3'
+              >
+                Hủy
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

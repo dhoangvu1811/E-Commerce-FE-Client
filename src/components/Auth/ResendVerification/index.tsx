@@ -1,12 +1,17 @@
 /* eslint-disable react/no-unescaped-entities */
 'use client'
 import React, { useState } from 'react'
-import { useForm, SubmitHandler } from 'react-hook-form'
+
+import Link from 'next/link'
+
+import type { SubmitHandler } from 'react-hook-form';
+import { useForm } from 'react-hook-form'
+
+import toast from 'react-hot-toast'
+
 import { useAppDispatch } from '@/redux/store'
 import { sendVerificationEmail } from '@/redux/slices/authSlice'
 import Breadcrumb from '@/components/Common/Breadcrumb'
-import Link from 'next/link'
-import toast from 'react-hot-toast'
 
 interface ResendForm {
   email: string

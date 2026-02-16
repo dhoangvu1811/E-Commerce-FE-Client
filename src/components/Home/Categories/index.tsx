@@ -1,6 +1,8 @@
 'use client'
-import { Swiper, SwiperSlide } from 'swiper/react'
 import { useCallback, useRef, useEffect } from 'react'
+
+import { Swiper, SwiperSlide } from 'swiper/react'
+
 import SingleItem from './SingleItem'
 import { useAppDispatch, useAppSelector } from '@/redux/store'
 import { fetchCategories } from '@/redux/slices/categorySlice'
@@ -12,9 +14,11 @@ import 'swiper/css'
 
 const Categories = () => {
   const dispatch = useAppDispatch()
+
   const { categories, loading } = useAppSelector(
     (state) => state.categoriesReducer
   )
+
   const sliderRef = useRef<any>(null)
 
   useEffect(() => {

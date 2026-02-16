@@ -1,5 +1,7 @@
 import React from "react";
+
 import Link from "next/link";
+
 import { useCartModalContext } from "@/app/context/CartSidebarModalContext";
 
 const EmptyCart = () => {

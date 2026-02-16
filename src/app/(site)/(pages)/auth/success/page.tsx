@@ -1,15 +1,18 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
+
 import { useRouter } from 'next/navigation'
+
+import toast from 'react-hot-toast'
+
 import { useAppDispatch } from '@/redux/store'
 import { fetchProfile } from '@/redux/slices/authSlice'
-import toast from 'react-hot-toast'
 
 export default function AuthSuccessPage() {
   const router = useRouter()
   const dispatch = useAppDispatch()
-  const [isLoading, setIsLoading] = useState(true)
+  const [_isLoading, setIsLoading] = useState(true)
   const hasRun = useRef(false)
 
   useEffect(() => {

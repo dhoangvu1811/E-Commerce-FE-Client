@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+
 import RangeSlider from 'react-range-slider-input'
 import 'react-range-slider-input/dist/style.css'
 
@@ -20,7 +21,9 @@ const PriceDropdown = ({
       from: Math.floor(e[0]),
       to: Math.ceil(e[1])
     }
+
     setSelectedPrice(newVal)
+
     if (onChange) {
       onChange({ min: newVal.from, max: newVal.to })
     }
@@ -84,6 +87,7 @@ const PriceDropdown = ({
                   onChange={(e) => {
                     const val = Number(e.target.value)
                     const newVal = { ...selectedPrice, from: val }
+
                     setSelectedPrice(newVal)
                     onChange && onChange({ min: newVal.from, max: newVal.to })
                   }}
@@ -102,6 +106,7 @@ const PriceDropdown = ({
                   onChange={(e) => {
                     const val = Number(e.target.value)
                     const newVal = { ...selectedPrice, to: val }
+
                     setSelectedPrice(newVal)
                     onChange && onChange({ min: newVal.from, max: newVal.to })
                   }}

@@ -1,8 +1,12 @@
 "use client";
-import { Swiper, SwiperSlide } from "swiper/react";
 import { useCallback, useRef } from "react";
-import testimonialsData from "./testimonialsData";
+
 import Image from "next/image";
+
+import { Swiper, SwiperSlide } from "swiper/react";
+
+import testimonialsData from "./testimonialsData";
+
 
 // Import Swiper styles
 import "swiper/css/navigation";
@@ -94,8 +98,10 @@ const Testimonials = () => {
                 },
                 1000: {
                   slidesPerView: 2,
+
                   // spaceBetween: 4,
                 },
+
                 // when window width is >= 768px
                 1200: {
                   slidesPerView: 3,

@@ -1,14 +1,16 @@
 import axiosInstance from '@/apis/axiosInstance'
 import { API_ENDPOINTS } from '@/apis/endpoints'
-import { ApiResponse } from '@/types/api.type'
-import {
+import type { ApiResponse } from '@/types/api.type'
+import type {
   ChangePasswordRequest,
   RevokeSessionRequest,
-  SessionInfo,
   SessionsResponse,
   UpdateProfileRequest,
   UploadAvatarResponse,
   User
+} from '@/types/auth.type';
+import {
+  SessionInfo
 } from '@/types/auth.type'
 
 export const userService = {
@@ -23,12 +25,14 @@ export const userService = {
     // If avatar is present, use FormData
     if (data.avatar) {
       const formData = new FormData()
+
       Object.entries(data).forEach(([key, value]) => {
         if (value !== undefined) {
           formData.append(key, value as string | Blob)
         }
       })
-      return await axiosInstance.put<ApiResponse<User>>(
+      
+return await axiosInstance.put<ApiResponse<User>>(
         API_ENDPOINTS.USER.PROFILE,
         formData,
         {
@@ -67,6 +71,7 @@ export const userService = {
 
   uploadAvatar: async (file: File) => {
     const formData = new FormData()
+
     formData.append('avatar', file)
 
     return await axiosInstance.post<ApiResponse<UploadAvatarResponse>>(

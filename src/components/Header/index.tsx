@@ -1,20 +1,28 @@
 'use client'
 import React, { useState, useEffect } from 'react'
+
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+
+import Image from 'next/image'
+
+import { useSelector } from 'react-redux'
+
+import toast from 'react-hot-toast'
+
 import CustomSelect from './CustomSelect'
 import { menuData } from './menuData'
 import Dropdown from './Dropdown'
 import { useAppSelector, useAppDispatch } from '@/redux/store'
-import { useSelector } from 'react-redux'
 import { selectTotalPrice } from '@/redux/slices/cartSlice'
 import { useCartModalContext } from '@/app/context/CartSidebarModalContext'
-import Image from 'next/image'
+
+
 import { formatCurrency } from '@/utils/formatCurrency'
 
 import { fetchCategories } from '@/redux/slices/categorySlice'
 import { fetchProfile, logout } from '@/redux/slices/authSlice'
-import toast from 'react-hot-toast'
+
 
 const Header = () => {
   const router = useRouter()
@@ -69,6 +77,7 @@ const Header = () => {
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId)
+
     // Clear search when changing category
     setSearchQuery('')
     
@@ -83,12 +92,16 @@ const Header = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
+
     if (searchQuery.trim()) {
       const params = new URLSearchParams()
+
       params.set('search', searchQuery.trim())
+
       if (selectedCategory) {
         params.set('categoryId', selectedCategory)
       }
+
       router.push(`/shop-with-sidebar?${params.toString()}`)
     } else if (selectedCategory) {
       router.push(`/shop-with-sidebar?categoryId=${selectedCategory}`)

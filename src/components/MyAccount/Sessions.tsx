@@ -1,15 +1,22 @@
 /* eslint-disable react/no-unescaped-entities */
 'use client'
 import React, { useEffect } from 'react'
+
+import toast from 'react-hot-toast'
+
 import { useAppDispatch, useAppSelector } from '@/redux/store'
 import { fetchMySessions, revokeMySession } from '@/redux/slices/authSlice'
-import { SessionInfo } from '@/types/auth.type'
-import toast from 'react-hot-toast'
+import type { SessionInfo } from '@/types/auth.type'
+import ConfirmationModal from '../Common/ConfirmationModal'
 
 const Sessions = () => {
   const dispatch = useAppDispatch()
   const [sessions, setSessions] = React.useState<SessionInfo[]>([])
   const [loading, setLoading] = React.useState(true)
+  
+  // Confirmation state
+  const [showRevokeConfirm, setShowRevokeConfirm] = React.useState(false)
+  const [sessionToRevoke, setSessionToRevoke] = React.useState<string | null>(null)
 
   useEffect(() => {
     loadSessions()
@@ -17,8 +24,10 @@ const Sessions = () => {
 
   const loadSessions = async () => {
     setLoading(true)
+
     try {
       const result = await dispatch(fetchMySessions()).unwrap()
+
       setSessions(result.sessions || [])
     } catch (error: any) {
       // Error toast handled by axios interceptor
@@ -27,16 +36,25 @@ const Sessions = () => {
     }
   }
 
-  const handleRevokeSession = async (sessionId: string) => {
-    if (!confirm('Are you sure you want to logout this device?')) return
+  const handleRevokeClick = (sessionId: string) => {
+    setSessionToRevoke(sessionId)
+    setShowRevokeConfirm(true)
+  }
+
+  const handleConfirmRevoke = async () => {
+    if (!sessionToRevoke) return
 
     try {
-      await dispatch(revokeMySession({ sessionId })).unwrap()
+      await dispatch(revokeMySession({ sessionId: sessionToRevoke })).unwrap()
       toast.success('Session revoked successfully')
+
       // Refresh sessions list
       await loadSessions()
     } catch (error: any) {
       // Error toast handled by axios interceptor
+    } finally {
+      setShowRevokeConfirm(false)
+      setSessionToRevoke(null)
     }
   }
 
@@ -52,6 +70,7 @@ const Sessions = () => {
 
   const getDeviceIcon = (deviceInfo: string) => {
     const info = deviceInfo.toLowerCase()
+
     if (info.includes('iphone') || info.includes('android')) {
       return (
         <svg className="fill-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -59,7 +78,9 @@ const Sessions = () => {
         </svg>
       )
     }
-    return (
+
+    
+return (
       <svg className="fill-current" width="20" height="20" viewBox="0 0 20 20" fill="none">
         <path d="M2 4a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V4zm2 11h12v1a1 1 0 01-1 1H5a1 1 0 01-1-1v-1z"/>
       </svg>
@@ -139,7 +160,7 @@ const Sessions = () => {
 
                 {!session.isCurrent && (
                   <button
-                    onClick={() => handleRevokeSession(session.sessionId)}
+                    onClick={() => handleRevokeClick(session.sessionId)}
                     className="text-red hover:text-red-dark text-sm font-medium whitespace-nowrap"
                   >
                     Logout
@@ -164,6 +185,18 @@ const Sessions = () => {
           Note: It may take up to 5 minutes for the device to be logged out.
         </p>
       </div>
+
+      
+      <ConfirmationModal
+        isOpen={showRevokeConfirm}
+        title='Revoke Session'
+        message='Are you sure you want to logout this device?'
+        onConfirm={handleConfirmRevoke}
+        onCancel={() => setShowRevokeConfirm(false)}
+        confirmText='Logout'
+        cancelText='Cancel'
+        isDanger={true}
+      />
     </div>
   )
 }

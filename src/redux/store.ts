@@ -1,5 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit'
 
+import type { TypedUseSelectorHook} from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux'
+
 import quickViewReducer from './slices/quickViewSlice'
 import cartReducer from './slices/cartSlice'
 import wishlistReducer from './slices/wishlistSlice'
@@ -8,8 +11,8 @@ import productsReducer from './slices/productsSlice'
 import categoriesReducer from './slices/categorySlice'
 import authReducer from './slices/authSlice'
 import orderReducer from './slices/orderSlice'
+import shippingAddressReducer from './slices/shippingAddressSlice'
 
-import { TypedUseSelectorHook, useSelector, useDispatch } from 'react-redux'
 import { injectStore } from '@/apis/axiosInstance'
 
 export const store = configureStore({
@@ -21,7 +24,8 @@ export const store = configureStore({
     productsReducer,
     categoriesReducer,
     authReducer,
-    orderReducer
+    orderReducer,
+    shippingAddressReducer
   }
 })
 

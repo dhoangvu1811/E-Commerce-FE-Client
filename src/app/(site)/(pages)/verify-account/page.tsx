@@ -1,6 +1,8 @@
-import VerifyAccount from '@/components/Auth/VerifyAccount'
 import React from 'react'
-import { Metadata } from 'next'
+
+import type { Metadata } from 'next'
+
+import VerifyAccount from '@/components/Auth/VerifyAccount'
 
 export const metadata: Metadata = {
   title: 'Verify Account | NextCommerce Nextjs E-commerce template',

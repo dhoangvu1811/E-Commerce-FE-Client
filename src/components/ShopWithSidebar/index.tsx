@@ -1,9 +1,14 @@
 'use client'
-import { useSearchParams } from 'next/navigation'
 import React, { useState, useEffect } from 'react'
+
+import { useSearchParams } from 'next/navigation'
+
+import { useForm } from 'react-hook-form'
+
 import Breadcrumb from '../Common/Breadcrumb'
 import CustomSelect from './CustomSelect'
 import CategoryDropdown from './CategoryDropdown'
+
 // Removed unused imports: GenderDropdown, SizeDropdown, ColorsDropdwon
 import PriceDropdown from './PriceDropdown'
 import SingleGridItem from '../Shop/SingleGridItem'
@@ -11,7 +16,8 @@ import SingleListItem from '../Shop/SingleListItem'
 import { useAppDispatch, useAppSelector } from '@/redux/store'
 import { fetchProducts } from '@/redux/slices/productsSlice'
 import { fetchCategories } from '@/redux/slices/categorySlice'
-import { useForm } from 'react-hook-form'
+
+
 import PreLoader from '../Common/PreLoader'
 import Pagination from '../Common/Pagination'
 
@@ -21,9 +27,11 @@ const ShopWithSidebar = () => {
   const searchParam = searchParams.get('search')
 
   const dispatch = useAppDispatch()
+
   const { products, loading, pagination } = useAppSelector(
     (state) => state.productsReducer
   )
+
   const { categories } = useAppSelector((state) => state.categoriesReducer)
 
   const [productStyle, setProductStyle] = useState('grid')
@@ -42,6 +50,7 @@ const ShopWithSidebar = () => {
   })
 
   const [priceRange, setPriceRange] = useState<{ min: number; max: number } | undefined>(undefined)
+
   // Key to force re-render PriceDropdown on reset
   const [resetKey, setResetKey] = useState(0)
 
@@ -52,7 +61,9 @@ const ShopWithSidebar = () => {
     const timer = setTimeout(() => {
       setDebouncedPriceRange(priceRange)
     }, 500)
-    return () => clearTimeout(timer)
+
+    
+return () => clearTimeout(timer)
   }, [priceRange])
 
   // Sync URL params if they change
@@ -88,8 +99,10 @@ const ShopWithSidebar = () => {
       fetchProducts({
         page: page,
         itemsPerPage: 9,
+
         /* @ts-ignore */
         categoryId: filterValues.categoryId,
+
         /* @ts-ignore */
         sort: filterValues.sort,
         search: searchValue,
@@ -125,15 +138,19 @@ const ShopWithSidebar = () => {
 
   useEffect(() => {
     window.addEventListener('scroll', handleStickyMenu)
+
     function handleClickOutside(event: any) {
       if (!event.target.closest('.sidebar-content')) {
         setProductSidebar(false)
       }
     }
+
     if (productSidebar) {
       document.addEventListener('mousedown', handleClickOutside)
     }
-    return () => {
+
+    
+return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   })

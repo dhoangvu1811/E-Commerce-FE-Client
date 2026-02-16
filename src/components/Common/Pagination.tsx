@@ -19,6 +19,7 @@ const Pagination: React.FC<PaginationProps> = ({
 
   const getPageNumbers = () => {
     const pages = []
+
     // Ensure we don't show too many pages.
     // If totalPages <= 7, show all.
     // If > 7, show start, end, and around current.
@@ -45,7 +46,9 @@ const Pagination: React.FC<PaginationProps> = ({
       // Let's implement a smarter slice: [1, ..., current-1, current, current+1, ..., last]
       // I'll stick to full list for < 10, else slice.
     }
-    return pages
+
+    
+return pages
   }
 
   const pages = getPageNumbers()

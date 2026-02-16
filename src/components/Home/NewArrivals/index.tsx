@@ -1,12 +1,15 @@
 'use client'
 import React, { useEffect, useState } from 'react'
+
 import Image from 'next/image'
 import Link from 'next/link'
+
+import toast from 'react-hot-toast'
+
 import ProductItem from '@/components/Common/ProductItem'
 import { productService } from '@/services'
-import { Product } from '@/types/product.type'
+import type { Product } from '@/types/product.type'
 import PreLoader from '@/components/Common/PreLoader'
-import toast from 'react-hot-toast'
 
 const NewArrival = () => {
   const [products, setProducts] = useState<Product[]>([])
@@ -19,6 +22,7 @@ const NewArrival = () => {
           sort: 'newest',
           itemsPerPage: 8
         })
+
         setProducts(data.data.products)
       } catch (error) {
         console.error('Failed to fetch new arrivals', error)
@@ -27,6 +31,7 @@ const NewArrival = () => {
         setLoading(false)
       }
     }
+
     fetchNewArrivals()
   }, [])
 

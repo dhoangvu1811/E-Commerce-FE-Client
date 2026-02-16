@@ -1,20 +1,33 @@
 'use client'
-import Breadcrumb from '@/components/Common/Breadcrumb'
-import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
-import { useForm, SubmitHandler } from 'react-hook-form'
+
+import Link from 'next/link'
+
 import { useRouter } from 'next/navigation'
-import { useAppDispatch, useAppSelector } from '@/redux/store'
-import { login, clearAuth } from '@/redux/slices/authSlice'
-import { LoginRequest } from '@/types/auth.type'
+
+import type { SubmitHandler } from 'react-hook-form';
+
+import { useForm } from 'react-hook-form'
+
 import toast from 'react-hot-toast'
+
+import Breadcrumb from '@/components/Common/Breadcrumb'
+
+
+
+import { useAppDispatch, useAppSelector } from '@/redux/store'
+import { login } from '@/redux/slices/authSlice'
+import type { LoginRequest } from '@/types/auth.type'
+
 
 const Signin = () => {
   const router = useRouter()
   const dispatch = useAppDispatch()
+
   const { isAuthenticated, loading, error, user } = useAppSelector(
     (state) => state.authReducer
   )
+
   const [showPassword, setShowPassword] = useState(false)
 
   const {
@@ -35,6 +48,7 @@ const Signin = () => {
   const onSubmit: SubmitHandler<LoginRequest> = async (data) => {
     try {
       await dispatch(login(data)).unwrap()
+
       // Success toast handled in useEffect
     } catch (error: any) {
       // Error toast handled by axios interceptor
@@ -45,11 +59,13 @@ const Signin = () => {
   // OAuth handlers
   const handleGoogleLogin = () => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8017/V1'
+
     window.location.href = `${baseUrl}/users/auth/google`
   }
 
   const handleFacebookLogin = () => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8017/V1'
+
     window.location.href = `${baseUrl}/users/auth/facebook`
   }
 

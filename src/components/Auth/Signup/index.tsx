@@ -1,18 +1,28 @@
 'use client'
-import Breadcrumb from '@/components/Common/Breadcrumb'
+import React, { useState } from 'react'
+
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
-import { useForm, SubmitHandler } from 'react-hook-form'
+
 import { useRouter } from 'next/navigation'
-import { useAppDispatch, useAppSelector } from '@/redux/store'
-import { register as registerUser, clearAuth } from '@/redux/slices/authSlice' // renamed to avoid conflict with hook form
-import { RegisterRequest } from '@/types/auth.type'
+
+import type { SubmitHandler } from 'react-hook-form';
+
+import { useForm } from 'react-hook-form'
+
 import toast from 'react-hot-toast'
+
+import Breadcrumb from '@/components/Common/Breadcrumb'
+
+
+
+import { useAppDispatch } from '@/redux/store'
+import { register as registerUser } from '@/redux/slices/authSlice' // renamed to avoid conflict with hook form
+import type { RegisterRequest } from '@/types/auth.type'
+
 
 const Signup = () => {
   const router = useRouter()
   const dispatch = useAppDispatch()
-  const { loading, error } = useAppSelector((state) => state.authReducer)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -41,11 +51,13 @@ const Signup = () => {
   // OAuth handlers
   const handleGoogleLogin = () => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8017/V1'
+
     window.location.href = `${baseUrl}/users/auth/google`
   }
 
   const handleFacebookLogin = () => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8017/V1'
+
     window.location.href = `${baseUrl}/users/auth/facebook`
   }
 

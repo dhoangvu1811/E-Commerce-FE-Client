@@ -1,11 +1,15 @@
 'use client'
 import React, { useEffect, useState, useRef } from 'react'
+
 import { useSearchParams, useRouter } from 'next/navigation'
+
+import Link from 'next/link'
+
+import toast from 'react-hot-toast'
+
 import { useAppDispatch } from '@/redux/store'
 import { verifyAccount } from '@/redux/slices/authSlice'
 import Breadcrumb from '@/components/Common/Breadcrumb'
-import Link from 'next/link'
-import toast from 'react-hot-toast'
 
 const VerifyAccount = () => {
   const searchParams = useSearchParams()
@@ -23,7 +27,8 @@ const VerifyAccount = () => {
     if (!email || !token) {
       setStatus('error')
       setMessage('Invalid verification link. Email and token are required.')
-      return
+      
+return
     }
 
     if (verifyAttempted.current) return

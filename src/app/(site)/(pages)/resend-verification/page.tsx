@@ -1,6 +1,8 @@
-import ResendVerification from '@/components/Auth/ResendVerification'
 import React from 'react'
-import { Metadata } from 'next'
+
+import type { Metadata } from 'next'
+
+import ResendVerification from '@/components/Auth/ResendVerification'
 
 export const metadata: Metadata = {
   title: 'Resend Verification | NextCommerce Nextjs E-commerce template',
