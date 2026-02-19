@@ -12,6 +12,7 @@ import categoriesReducer from './slices/categorySlice'
 import authReducer from './slices/authSlice'
 import orderReducer from './slices/orderSlice'
 import shippingAddressReducer from './slices/shippingAddressSlice'
+import voucherReducer from './slices/voucherSlice'
 
 import { injectStore } from '@/apis/axiosInstance'
 
@@ -25,7 +26,8 @@ export const store = configureStore({
     categoriesReducer,
     authReducer,
     orderReducer,
-    shippingAddressReducer
+    shippingAddressReducer,
+    voucherReducer
   }
 })
 

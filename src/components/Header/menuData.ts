@@ -20,6 +20,12 @@ export const menuData: Menu[] = [
     path: "/contact",
   },
   {
+    id: 4,
+    title: "Vouchers",
+    newTab: false,
+    path: "/vouchers",
+  },
+  {
     id: 6,
     title: "pages",
     newTab: false,
@@ -54,6 +60,12 @@ export const menuData: Menu[] = [
         title: "Wishlist",
         newTab: false,
         path: "/wishlist",
+      },
+      {
+        id: 71,
+        title: "Vouchers",
+        newTab: false,
+        path: "/vouchers",
       },
       {
         id: 67,

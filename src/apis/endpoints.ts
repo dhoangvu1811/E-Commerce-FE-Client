@@ -43,6 +43,12 @@ export const API_ENDPOINTS = {
     CANCEL: (id: number | string) => `/orders/cancel/${id}`
   },
 
+  // Voucher Management (Public endpoints)
+  VOUCHERS: {
+    VERIFY: '/vouchers/verify',
+    ACTIVE: '/vouchers/active'
+  },
+
   // Shipping Address Management
   SHIPPING_ADDRESSES: {
     LIST: '/shipping-addresses',
