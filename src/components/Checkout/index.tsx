@@ -13,6 +13,7 @@ import { formatCurrency } from '@/utils/formatCurrency'
 import { useAppDispatch, useAppSelector } from '@/redux/store'
 import { selectCartItems, selectTotalPrice, removeAllItemsFromCart } from '@/redux/slices/cartSlice'
 import { createOrder, clearOrderError } from '@/redux/slices/orderSlice'
+import { resetVoucher } from '@/redux/slices/voucherSlice'
 import { fetchMyAddresses, selectAddresses } from '@/redux/slices/shippingAddressSlice'
 import type { PaymentMethod as PaymentMethodType, CreateOrderPayload } from '@/types/order.type'
 
@@ -23,6 +24,9 @@ const Checkout = () => {
   const subtotal = useAppSelector(selectTotalPrice)
   const { creating, error } = useAppSelector((state) => state.orderReducer)
   const addresses = useAppSelector(selectAddresses)
+  
+  // Lấy state voucher từ Redux
+  const { appliedVoucher, voucherCode } = useAppSelector((state) => state.voucherReducer)
 
   // Selected saved address id (null = initial load, '' = new address)
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
@@ -81,18 +85,20 @@ return
   }
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('COD')
-  const [voucherCode, setVoucherCode] = useState('')
 
   // Shipping fee (fixed for now)
   const shippingFee = 0
+
+  // Discount từ voucher đã verify
+  const discount = appliedVoucher?.discount ?? 0
 
   // Validation errors
   const [formErrors, setFormErrors] = useState<string[]>([])
 
   // Totals
   const total = useMemo(() => {
-    return Math.max(0, subtotal + shippingFee)
-  }, [subtotal, shippingFee])
+    return Math.max(0, subtotal + shippingFee - discount)
+  }, [subtotal, shippingFee, discount])
 
   const handleShippingChange = (field: string, value: string) => {
     setShippingAddress((prev) => ({ ...prev, [field]: value }))
@@ -171,8 +177,9 @@ return errors.length === 0
       const result = await dispatch(createOrder(payload)).unwrap()
 
 
-      // Clear cart after successful order
+      // Clear cart và voucher sau khi đặt hàng thành công
       dispatch(removeAllItemsFromCart())
+      dispatch(resetVoucher())
       toast.success(`Đặt hàng thành công! Mã đơn: ${result?.orderCode || 'N/A'}`)
       router.push('/my-account')
     } catch (err: any) {
@@ -287,6 +294,23 @@ return errors.length === 0
                       </div>
                     ))}
 
+                    {/* Giảm giá voucher */}
+                    {discount > 0 && (
+                      <div className='flex items-center justify-between py-5 border-b border-gray-3'>
+                        <p className='text-green'>
+                          Giảm giá
+                          {appliedVoucher?.voucher.code && (
+                            <span className='ml-1 text-xs bg-green-light-6 text-green px-1.5 py-0.5 rounded font-mono'>
+                              {appliedVoucher.voucher.code}
+                            </span>
+                          )}
+                        </p>
+                        <p className='text-green text-right font-medium'>
+                          - {formatCurrency(discount)}
+                        </p>
+                      </div>
+                    )}
+
                     {/* Shipping fee */}
                     <div className='flex items-center justify-between py-5 border-b border-gray-3'>
                       <p className='text-dark'>Phí vận chuyển</p>
@@ -307,11 +331,8 @@ return errors.length === 0
                   </div>
                 </div>
 
-                {/* Coupon */}
-                <Coupon
-                  voucherCode={voucherCode}
-                  onChange={setVoucherCode}
-                />
+                {/* Coupon - truyền subtotal để có thể tính discount */}
+                <Coupon subtotal={subtotal} />
 
                 {/* Payment method */}
                 <PaymentMethod
