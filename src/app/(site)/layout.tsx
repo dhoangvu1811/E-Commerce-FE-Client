@@ -18,6 +18,7 @@ import ScrollToTop from "@/components/Common/ScrollToTop";
 import PreLoader from "@/components/Common/PreLoader";
 import { ToastProvider } from "@/components/providers/ToastProvider";
 import CartHydration from "@/components/providers/CartHydration";
+import { SocketProvider } from "@/components/providers/SocketProvider";
 
 export default function RootLayout({
   children,
@@ -39,18 +40,20 @@ export default function RootLayout({
           <>
             <ReduxProvider>
               <CartHydration />
-              <CartModalProvider>
-                <ModalProvider>
-                  <PreviewSliderProvider>
-                    <Header />
-                    {children}
+              <SocketProvider>
+                <CartModalProvider>
+                  <ModalProvider>
+                    <PreviewSliderProvider>
+                      <Header />
+                      {children}
 
-                    <QuickViewModal />
-                    <CartSidebarModal />
-                    <PreviewSliderModal />
-                  </PreviewSliderProvider>
-                </ModalProvider>
-              </CartModalProvider>
+                      <QuickViewModal />
+                      <CartSidebarModal />
+                      <PreviewSliderModal />
+                    </PreviewSliderProvider>
+                  </ModalProvider>
+                </CartModalProvider>
+              </SocketProvider>
             </ReduxProvider>
             <ScrollToTop />
             <Footer />
