@@ -64,7 +64,7 @@ const BestSeller = () => {
         {loading ? (
           <PreLoader />
         ) : (
-          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7.5'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-7.5 items-stretch'>
             {/* <!-- Best Sellers item --> */}
             {products.map((item, key) => (
               <SingleItem item={item} key={item.id || key} />

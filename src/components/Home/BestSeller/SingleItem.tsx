@@ -33,6 +33,7 @@ const SingleItem = ({ item }: { item: Product }) => {
 
   // add to cart
   const handleAddToCart = () => {
+    if (item.stock === 0) return
     dispatch(
       addItemToCart({
         id: item.id,
@@ -43,7 +44,8 @@ const SingleItem = ({ item }: { item: Product }) => {
           item.images?.[0]?.image ||
           '/images/product/product-01.png',
         discountedPrice,
-        quantity: 1
+        quantity: 1,
+        stock: item.stock
       })
     )
   }
@@ -66,9 +68,14 @@ const SingleItem = ({ item }: { item: Product }) => {
   }
 
   return (
-    <div className='group'>
-      <div className='relative overflow-hidden rounded-lg bg-[#F6F7FB] min-h-[403px]'>
-        <div className='text-center px-4 py-7.5'>
+    <div className='group h-full'>
+      <div className='relative overflow-hidden rounded-lg bg-[#F6F7FB] h-full flex flex-col'>
+        {discount > 0 && (
+          <span className='absolute top-3 right-3 z-50 font-bold text-xs text-white bg-red rounded px-2 py-1 shadow-md'>
+            -{discount}%
+          </span>
+        )}
+        <div className='text-center px-4 py-7.5 flex-shrink-0'>
           <div className='flex items-center justify-center gap-2.5 mb-2'>
             <div className='flex items-center gap-1'>
               {[1, 2, 3, 4, 5].map((star) => (
@@ -85,7 +92,7 @@ const SingleItem = ({ item }: { item: Product }) => {
             <p className='text-custom-sm'>({item.rating || 0})</p>
           </div>
 
-          <h3 className='font-medium text-dark ease-out duration-200 hover:text-blue mb-1.5'>
+          <h3 className='font-medium text-dark ease-out duration-200 hover:text-blue mb-1.5 line-clamp-2 min-h-[3rem]'>
             <Link href={`/shop-details?id=${item.id}`}> {item.name} </Link>
           </h3>
 
@@ -99,7 +106,7 @@ const SingleItem = ({ item }: { item: Product }) => {
           </span>
         </div>
 
-        <div className='flex justify-center items-center'>
+        <div className='flex justify-center items-center h-[240px]'>
           <Image
             src={
               item.image ||
@@ -107,8 +114,9 @@ const SingleItem = ({ item }: { item: Product }) => {
               '/images/product/product-01.png'
             }
             alt={item.name}
-            width={280}
-            height={280}
+            width={220}
+            height={220}
+            className='object-contain w-full h-full'
           />
         </div>
 
@@ -147,9 +155,14 @@ const SingleItem = ({ item }: { item: Product }) => {
 
           <button
             onClick={() => handleAddToCart()}
+            disabled={item.stock === 0}
             aria-label='button for add to cart'
             id='addCartOne'
-            className='flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 ease-out duration-200 text-dark bg-white hover:text-white hover:bg-blue'
+            className={`flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 ease-out duration-200 bg-white ${
+              item.stock === 0
+                ? 'text-gray-4 cursor-not-allowed'
+                : 'text-dark hover:text-white hover:bg-blue'
+            }`}
           >
             <svg
               className='fill-current'

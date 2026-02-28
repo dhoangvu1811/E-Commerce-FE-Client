@@ -34,6 +34,7 @@ const ProductItem = ({ item }: { item: Product }) => {
 
   // add to cart
   const handleAddToCart = () => {
+    if (item.stock === 0) return
     dispatch(
       addItemToCart({
         id: item.id,
@@ -44,7 +45,8 @@ const ProductItem = ({ item }: { item: Product }) => {
           item.images?.[0]?.image ||
           '/images/product/product-01.png',
         discountedPrice,
-        quantity: 1
+        quantity: 1,
+        stock: item.stock
       })
     )
   }
@@ -71,8 +73,8 @@ const ProductItem = ({ item }: { item: Product }) => {
   }
 
   return (
-    <div className='group'>
-      <div className='relative overflow-hidden flex items-center justify-center rounded-lg bg-[#F6F7FB] min-h-[270px] mb-4'>
+    <div className='group flex flex-col h-full bg-white rounded-lg shadow-1'>
+      <div className='relative overflow-hidden flex items-center justify-center h-[270px] bg-[#F6F7FB] flex-shrink-0'>
         <Image
           src={
             item.image ||
@@ -82,7 +84,13 @@ const ProductItem = ({ item }: { item: Product }) => {
           alt={item.name}
           width={250}
           height={250}
+          className='object-contain h-full w-full p-4'
         />
+        {discount > 0 && (
+          <span className='absolute top-3 right-3 z-50 font-bold text-xs text-white bg-red rounded px-2 py-1 shadow-md'>
+            -{discount}%
+          </span>
+        )}
 
         <div className='absolute left-0 bottom-0 translate-y-full w-full flex items-center justify-center gap-2.5 pb-5 ease-linear duration-200 group-hover:translate-y-0'>
           <button
@@ -119,9 +127,14 @@ const ProductItem = ({ item }: { item: Product }) => {
 
           <button
             onClick={() => handleAddToCart()}
-            className='inline-flex font-medium text-custom-sm py-[7px] px-5 rounded-[5px] bg-blue text-white ease-out duration-200 hover:bg-blue-dark'
+            disabled={item.stock === 0}
+            className={`inline-flex font-medium text-custom-sm py-[7px] px-5 rounded-[5px] text-white ease-out duration-200 ${
+              item.stock === 0
+                ? 'bg-gray-4 cursor-not-allowed'
+                : 'bg-blue hover:bg-blue-dark'
+            }`}
           >
-            Add to cart
+            {item.stock === 0 ? 'Hết hàng' : 'Add to cart'}
           </button>
 
           <button
@@ -149,37 +162,39 @@ const ProductItem = ({ item }: { item: Product }) => {
         </div>
       </div>
 
-      <div className='flex items-center gap-2.5 mb-2'>
-        <div className='flex items-center gap-1'>
-          {[1, 2, 3, 4, 5].map((star) => (
-            <Image
-              key={star}
-              src='/images/icons/icon-star.svg'
-              alt='star icon'
-              width={14}
-              height={14}
-            />
-          ))}
+      {/* Info section */}
+      <div className='flex flex-col flex-1 px-4 pb-5 pt-4'>
+        <div className='flex items-center gap-2.5 mb-2'>
+          <div className='flex items-center gap-1'>
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Image
+                key={star}
+                src='/images/icons/icon-star.svg'
+                alt='star icon'
+                width={14}
+                height={14}
+              />
+            ))}
+          </div>
+          <p className='text-custom-sm'>({item.rating || 0})</p>
         </div>
 
-        <p className='text-custom-sm'>({item.rating || 0})</p>
+        <h3
+          className='font-medium text-dark ease-out duration-200 hover:text-blue mb-1.5 line-clamp-2 min-h-[3rem]'
+          onClick={() => handleProductDetails()}
+        >
+          <Link href='/shop-details'>{item.name}</Link>
+        </h3>
+
+        <span className='mt-auto flex items-center gap-2 font-medium text-lg'>
+          <span className='text-dark'>{formatCurrency(discountedPrice)}</span>
+          {discount > 0 && (
+            <span className='text-dark-4 line-through'>
+              {formatCurrency(price)}
+            </span>
+          )}
+        </span>
       </div>
-
-      <h3
-        className='font-medium text-dark ease-out duration-200 hover:text-blue mb-1.5'
-        onClick={() => handleProductDetails()}
-      >
-        <Link href='/shop-details'> {item.name} </Link>
-      </h3>
-
-      <span className='flex items-center gap-2 font-medium text-lg'>
-        <span className='text-dark'>{formatCurrency(discountedPrice)}</span>
-        {discount > 0 && (
-          <span className='text-dark-4 line-through'>
-            {formatCurrency(price)}
-          </span>
-        )}
-      </span>
     </div>
   )
 }
