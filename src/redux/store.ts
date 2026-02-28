@@ -14,8 +14,12 @@ import orderReducer from './slices/orderSlice'
 import shippingAddressReducer from './slices/shippingAddressSlice'
 import voucherReducer from './slices/voucherSlice'
 
+import { cartListenerMiddleware } from './middleware/cartListenerMiddleware'
 import { injectStore } from '@/apis/axiosInstance'
 
+// store khởi tạo với cartItems = [] trên cả server lẫn client
+// → tránh hydration mismatch
+// localStorage được load sau khi mount qua CartHydration component
 export const store = configureStore({
   reducer: {
     quickViewReducer,
@@ -28,7 +32,9 @@ export const store = configureStore({
     orderReducer,
     shippingAddressReducer,
     voucherReducer
-  }
+  },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().prepend(cartListenerMiddleware.middleware)
 })
 
 // Inject store to axios instance to avoid circular dependency
