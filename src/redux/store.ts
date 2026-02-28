@@ -13,6 +13,7 @@ import authReducer from './slices/authSlice'
 import orderReducer from './slices/orderSlice'
 import shippingAddressReducer from './slices/shippingAddressSlice'
 import voucherReducer from './slices/voucherSlice'
+import notificationReducer from './slices/notificationSlice'
 
 import { cartListenerMiddleware } from './middleware/cartListenerMiddleware'
 import { injectStore } from '@/apis/axiosInstance'
@@ -31,7 +32,8 @@ export const store = configureStore({
     authReducer,
     orderReducer,
     shippingAddressReducer,
-    voucherReducer
+    voucherReducer,
+    notificationReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().prepend(cartListenerMiddleware.middleware)

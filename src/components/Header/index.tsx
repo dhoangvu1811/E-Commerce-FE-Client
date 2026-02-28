@@ -15,6 +15,7 @@ import { menuData } from './menuData'
 import Dropdown from './Dropdown'
 import { useAppSelector, useAppDispatch } from '@/redux/store'
 import { selectTotalPrice } from '@/redux/slices/cartSlice'
+import { fetchNotifications } from '@/redux/slices/notificationSlice'
 import { useCartModalContext } from '@/app/context/CartSidebarModalContext'
 
 
@@ -37,11 +38,19 @@ const Header = () => {
   const { isAuthenticated, user } = useAppSelector((state) => state.authReducer)
   const product = useAppSelector((state) => state.cartReducer.cartItems)
   const totalPrice = useSelector(selectTotalPrice)
+  const { unreadCount } = useAppSelector((state) => state.notificationReducer)
 
   useEffect(() => {
     dispatch(fetchCategories(undefined))
     dispatch(fetchProfile())
   }, [dispatch])
+
+  // Fetch notification count khi đã đăng nhập
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchNotifications({ page: 1, limit: 1 }))
+    }
+  }, [dispatch, isAuthenticated])
 
   const handleOpenCartModal = () => {
     openCartModal()
@@ -315,6 +324,39 @@ const Header = () => {
                         Sign In
                       </p>
                     </div>
+                  </Link>
+                )}
+
+                {/* Notification bell - chỉ hiển thị khi đăng nhập */}
+                {isAuthenticated && (
+                  <Link
+                    href='/my-account?tab=notifications'
+                    className='relative inline-flex items-center justify-center'
+                    title='Thông báo'
+                  >
+                    <svg
+                      width='24'
+                      height='24'
+                      viewBox='0 0 24 24'
+                      fill='none'
+                      xmlns='http://www.w3.org/2000/svg'
+                    >
+                      <path
+                        fillRule='evenodd'
+                        clipRule='evenodd'
+                        d='M12 2C8.68629 2 6 4.68629 6 8V9.58579C6 10.0066 5.83268 10.4101 5.53553 10.7071L4.29289 11.9497C3.47582 12.7668 3 13.8613 3 15.0042V15.5C3 16.8807 4.11929 18 5.5 18H18.5C19.8807 18 21 16.8807 21 15.5V15.0042C21 13.8613 20.5242 12.7668 19.7071 11.9497L18.4645 10.7071C18.1673 10.4101 18 10.0066 18 9.58579V8C18 4.68629 15.3137 2 12 2ZM8 8C8 5.79086 9.79086 4 12 4C14.2091 4 16 5.79086 16 8V9.58579C16 10.5371 16.378 11.4495 17.0503 12.1213L18.2929 13.364C18.7456 13.8167 19 14.3977 19 15.0042V15.5C19 15.7761 18.7761 16 18.5 16H5.5C5.22386 16 5 15.7761 5 15.5V15.0042C5 14.3977 5.25439 13.8167 5.70711 13.364L6.94975 12.1213C7.62203 11.4495 8 10.5371 8 9.58579V8Z'
+                        fill='#3C50E0'
+                      />
+                      <path
+                        d='M10 19C10 20.1046 10.8954 21 12 21C13.1046 21 14 20.1046 14 19H10Z'
+                        fill='#3C50E0'
+                      />
+                    </svg>
+                    {unreadCount > 0 && (
+                      <span className='flex items-center justify-center font-medium text-2xs absolute -right-2 -top-2 bg-red-500 w-4.5 h-4.5 rounded-full text-white'>
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
                   </Link>
                 )}
 

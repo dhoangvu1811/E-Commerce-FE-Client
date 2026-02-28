@@ -59,6 +59,15 @@ export const API_ENDPOINTS = {
     CLEAR: '/cart/clear'
   },
 
+  // Notification Management
+  NOTIFICATIONS: {
+    LIST: '/notifications',
+    MARK_READ: (id: number | string) => `/notifications/${id}/read`,
+    MARK_ALL_READ: '/notifications/read-all',
+    DELETE: (id: number | string) => `/notifications/${id}`,
+    DELETE_READ: '/notifications/delete-read'
+  },
+
   // Shipping Address Management
   SHIPPING_ADDRESSES: {
     LIST: '/shipping-addresses',
