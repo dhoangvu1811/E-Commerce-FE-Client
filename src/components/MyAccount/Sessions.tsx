@@ -13,7 +13,8 @@ const Sessions = () => {
   const dispatch = useAppDispatch()
   const [sessions, setSessions] = React.useState<SessionInfo[]>([])
   const [loading, setLoading] = React.useState(true)
-  
+  const [refreshing, setRefreshing] = React.useState(false)
+
   // Confirmation state
   const [showRevokeConfirm, setShowRevokeConfirm] = React.useState(false)
   const [sessionToRevoke, setSessionToRevoke] = React.useState<string | null>(null)
@@ -33,6 +34,20 @@ const Sessions = () => {
       // Error toast handled by axios interceptor
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleRefresh = async () => {
+    setRefreshing(true)
+
+    try {
+      const result = await dispatch(fetchMySessions()).unwrap()
+
+      setSessions(result.sessions || [])
+    } catch (error: any) {
+      // Error toast handled by axios interceptor
+    } finally {
+      setRefreshing(false)
     }
   }
 
@@ -101,14 +116,25 @@ return (
       <div className="flex items-center justify-between mb-6">
         <h3 className="font-medium text-lg text-dark">Active Sessions</h3>
         <button
-          onClick={loadSessions}
-          className="text-blue hover:text-blue-dark text-sm flex items-center gap-1"
+          onClick={handleRefresh}
+          disabled={refreshing}
+          title='Làm mới'
+          className="flex items-center gap-1.5 text-sm text-blue hover:text-blue-dark disabled:opacity-50 disabled:cursor-not-allowed ease-out duration-200"
         >
-          <svg className="fill-current" width="16" height="16" viewBox="0 0 16 16">
-            <path d="M13.65 2.35A8 8 0 102.35 13.65 8 8 0 0013.65 2.35zm-1.41 1.41A6 6 0 113.76 12.24 6 6 0 0112.24 3.76z"/>
-            <path d="M8 4v4l3 3"/>
+          <svg
+            className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`}
+            fill='none'
+            viewBox='0 0 24 24'
+            stroke='currentColor'
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              strokeWidth={2}
+              d='M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'
+            />
           </svg>
-          Refresh
+          {refreshing ? 'Đang làm mới...' : 'Làm mới'}
         </button>
       </div>
 
