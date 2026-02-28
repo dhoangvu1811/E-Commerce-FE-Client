@@ -8,6 +8,9 @@ import toast from 'react-hot-toast'
 
 import { useAppDispatch } from '@/redux/store'
 import { fetchProfile } from '@/redux/slices/authSlice'
+import { syncGuestCartToServer, type CartItem } from '@/redux/slices/cartSlice'
+
+const GUEST_CART_KEY = 'guest_cart'
 
 export default function AuthSuccessPage() {
   const router = useRouter()
@@ -22,12 +25,48 @@ export default function AuthSuccessPage() {
 
     const fetchUserAfterOAuth = async () => {
       try {
-        // Fetch user profile to update Redux state after OAuth login
+        // 1. Đọc guest cart từ localStorage TRƯỚC khi dispatch bất kỳ action nào
+        //    (fetchProfile.fulfilled listener có thể gọi fetchCartFromServer và ghi đè localStorage)
+        let guestItems: CartItem[] = []
+
+        if (typeof window !== 'undefined') {
+          try {
+            const raw = localStorage.getItem(GUEST_CART_KEY)
+
+            if (raw) {
+              const parsed = JSON.parse(raw)
+
+              // Format mới: { items, savedAt }
+              if (parsed && typeof parsed === 'object' && Array.isArray(parsed.items)) {
+                guestItems = parsed.items
+              } else if (Array.isArray(parsed)) {
+                // Tương thích ngược: format cũ là mảng thuần
+                guestItems = parsed
+              }
+            }
+          } catch {
+            guestItems = []
+          }
+          
+          // Xóa localStorage ngay để tránh sync trùng lặp
+          localStorage.removeItem(GUEST_CART_KEY)
+        }
+
+        // 2. Dispatch syncGuestCartToServer TRƯỚC fetchProfile
+        //    => syncGuestCartToServer.pending sets syncing = true synchronously
+        //    => fetchProfile.fulfilled listener sẽ thấy syncing = true và skip fetchCartFromServer
+        //    Điều này ngăn fetchCartFromServer ghi đè cart trước khi sync hoàn tất
+        const syncPromise = dispatch(syncGuestCartToServer(guestItems))
+
+        // 3. Fetch profile song song (không cần đợi sync xong)
         await dispatch(fetchProfile()).unwrap()
-        
+
+        // 4. Đợi sync hoàn tất (nếu chưa xong)
+        await syncPromise
+
         // Show success message
         toast.success('Đăng nhập thành công! Đang chuyển hướng...')
-        
+
         // Redirect to dashboard after 2 seconds
         setTimeout(() => {
           router.push('/my-account')
