@@ -19,10 +19,12 @@ const SingleItem = ({ item }) => {
   }
 
   const handleAddToCart = () => {
+    if (item.stock === 0) return
     dispatch(
       addItemToCart({
         ...item,
-        quantity: 1
+        quantity: 1,
+        stock: item.stock ?? 0
       })
     )
   }
@@ -109,9 +111,14 @@ const SingleItem = ({ item }) => {
       <div className='min-w-[150px] flex justify-end'>
         <button
           onClick={() => handleAddToCart()}
-          className='inline-flex text-dark hover:text-white bg-gray-1 border border-gray-3 py-2.5 px-6 rounded-md ease-out duration-200 hover:bg-blue hover:border-gray-3'
+          disabled={item.stock === 0}
+          className={`inline-flex py-2.5 px-6 rounded-md ease-out duration-200 border ${
+            item.stock === 0
+              ? 'text-gray-4 bg-gray-2 border-gray-3 cursor-not-allowed'
+              : 'text-dark hover:text-white bg-gray-1 border-gray-3 hover:bg-blue hover:border-gray-3'
+          }`}
         >
-          Add to Cart
+          {item.stock === 0 ? 'Hết hàng' : 'Add to Cart'}
         </button>
       </div>
     </div>

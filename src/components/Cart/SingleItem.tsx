@@ -22,6 +22,8 @@ const SingleItem = ({ item }) => {
   }
 
   const handleIncreaseQuantity = () => {
+    // Giới hạn không vượt quá stock
+    if (quantity >= item.stock) return
     setQuantity(quantity + 1)
     dispatch(updateCartItemQuantity({ id: item.id, quantity: quantity + 1 }))
   }
@@ -86,7 +88,10 @@ const SingleItem = ({ item }) => {
           <button
             onClick={() => handleIncreaseQuantity()}
             aria-label='button for add product'
-            className='flex items-center justify-center w-11.5 h-11.5 ease-out duration-200 hover:text-blue'
+            disabled={quantity >= item.stock}
+            className={`flex items-center justify-center w-11.5 h-11.5 ease-out duration-200 ${
+              quantity >= item.stock ? 'text-gray-4 cursor-not-allowed' : 'hover:text-blue'
+            }`}
           >
             <svg
               className='fill-current'

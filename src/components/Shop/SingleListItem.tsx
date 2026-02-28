@@ -33,6 +33,7 @@ const SingleListItem = ({ item }: { item: Product }) => {
 
   // add to cart
   const handleAddToCart = () => {
+    if (item.stock === 0) return
     dispatch(
       addItemToCart({
         id: item.id,
@@ -43,7 +44,8 @@ const SingleListItem = ({ item }: { item: Product }) => {
           item.images?.[0]?.image ||
           '/images/product/product-01.png',
         discountedPrice,
-        quantity: 1
+        quantity: 1,
+        stock: item.stock
       })
     )
   }
@@ -79,6 +81,11 @@ const SingleListItem = ({ item }: { item: Product }) => {
             width={250}
             height={250}
           />
+          {discount > 0 && (
+            <span className='absolute top-3 right-3 z-50 font-bold text-xs text-white bg-red rounded px-2 py-1 shadow-md'>
+              -{discount}%
+            </span>
+          )}
 
           <div className='absolute left-0 bottom-0 translate-y-full w-full flex items-center justify-center gap-2.5 pb-5 ease-linear duration-200 group-hover:translate-y-0'>
             <button
@@ -114,9 +121,14 @@ const SingleListItem = ({ item }: { item: Product }) => {
 
             <button
               onClick={() => handleAddToCart()}
-              className='inline-flex font-medium text-custom-sm py-[7px] px-5 rounded-[5px] bg-blue text-white ease-out duration-200 hover:bg-blue-dark'
+              disabled={item.stock === 0}
+              className={`inline-flex font-medium text-custom-sm py-[7px] px-5 rounded-[5px] text-white ease-out duration-200 ${
+                item.stock === 0
+                  ? 'bg-gray-4 cursor-not-allowed'
+                  : 'bg-blue hover:bg-blue-dark'
+              }`}
             >
-              Add to cart
+              {item.stock === 0 ? 'Hết hàng' : 'Add to cart'}
             </button>
 
             <button

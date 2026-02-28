@@ -16,6 +16,7 @@ const AccountDetails = () => {
   const { user } = useAppSelector((state) => state.authReducer)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(user?.avatar || null)
+  const [refreshing, setRefreshing] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [showCurrentPassword, setShowCurrentPassword] = useState(false)
   const [showNewPassword, setShowNewPassword] = useState(false)
@@ -140,11 +141,46 @@ return
     fileInputRef.current?.click()
   }
 
+  const handleRefresh = async () => {
+    setRefreshing(true)
+
+    try {
+      await dispatch(fetchProfile()).unwrap()
+    } catch (error: any) {
+      // Error toast handled by axios interceptor
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
   return (
     <>
       {/* Avatar Upload Section */}
       <div className='bg-white shadow-1 rounded-xl p-4 sm:p-8.5 mb-7.5'>
-        <h3 className='font-medium text-lg text-dark mb-5'>Profile Picture</h3>
+        <div className='flex items-center justify-between mb-5'>
+          <h3 className='font-medium text-lg text-dark'>Profile Picture</h3>
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing || uploadingAvatar}
+            title='Làm mới'
+            className='flex items-center gap-1.5 text-sm text-blue hover:text-blue-dark disabled:opacity-50 disabled:cursor-not-allowed ease-out duration-200'
+          >
+            <svg
+              className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`}
+              fill='none'
+              viewBox='0 0 24 24'
+              stroke='currentColor'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'
+              />
+            </svg>
+            {refreshing ? 'Đang làm mới...' : 'Làm mới'}
+          </button>
+        </div>
         <div className='flex flex-col sm:flex-row items-center gap-6'>
           <div className='relative'>
             <div className='w-32 h-32 rounded-full overflow-hidden border-4 border-gray-3'>

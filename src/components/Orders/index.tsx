@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import SingleOrder from './SingleOrder'
 import { useAppDispatch, useAppSelector } from '@/redux/store'
@@ -6,6 +6,7 @@ import { fetchMyOrders } from '@/redux/slices/orderSlice'
 
 const Orders = () => {
   const dispatch = useAppDispatch()
+  const [refreshing, setRefreshing] = useState(false)
 
   const { orders, loading, error, pagination } = useAppSelector(
     (state) => state.orderReducer
@@ -23,6 +24,12 @@ const Orders = () => {
 
   const handleRetry = () => {
     dispatch(fetchMyOrders({ page: pagination.page || 1, itemsPerPage: 10 }))
+  }
+
+  const handleRefresh = async () => {
+    setRefreshing(true)
+    await dispatch(fetchMyOrders({ page: pagination.page || 1, itemsPerPage: 10 }))
+    setRefreshing(false)
   }
 
   if (loading && orders.length === 0) {
@@ -83,6 +90,32 @@ const Orders = () => {
 
   return (
     <>
+      {/* Header with refresh button */}
+      <div className='flex items-center justify-between py-4 px-7.5 border-b border-gray-3'>
+        <h3 className='font-medium text-lg text-dark'>Đơn hàng của tôi</h3>
+        <button
+          onClick={handleRefresh}
+          disabled={refreshing || loading}
+          title='Làm mới'
+          className='flex items-center gap-1.5 text-sm text-blue hover:text-blue-dark disabled:opacity-50 disabled:cursor-not-allowed ease-out duration-200'
+        >
+          <svg
+            className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`}
+            fill='none'
+            viewBox='0 0 24 24'
+            stroke='currentColor'
+          >
+            <path
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              strokeWidth={2}
+              d='M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15'
+            />
+          </svg>
+          {refreshing ? 'Đang làm mới...' : 'Làm mới'}
+        </button>
+      </div>
+
       <div className='w-full overflow-x-auto'>
         <div className='min-w-[770px]'>
           {/* <!-- order item --> */}

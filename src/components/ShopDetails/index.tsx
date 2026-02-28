@@ -3,14 +3,15 @@ import React, { useEffect, useState } from 'react'
 
 import Image from 'next/image'
 
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 
 import Breadcrumb from '../Common/Breadcrumb'
 import Newsletter from '../Common/Newsletter'
 import RecentlyViewdItems from './RecentlyViewd'
 import { usePreviewSlider } from '@/app/context/PreviewSliderContext'
 import { useAppDispatch, useAppSelector } from '@/redux/store'
-
+import { addItemToCart } from '@/redux/slices/cartSlice'
+import { addItemToWishlist } from '@/redux/slices/wishlistSlice'
 
 import { fetchProductDetails } from '@/redux/slices/productDetailsSlice'
 import PreLoader from '../Common/PreLoader'
@@ -37,6 +38,8 @@ const ShopDetails = () => {
   const { openPreviewModal } = usePreviewSlider()
   const [previewImg, setPreviewImg] = useState(0)
   const [activeTab, setActiveTab] = useState('tabOne')
+  const [quantity, setQuantity] = useState(1)
+  const router = useRouter()
 
   // Calculate discount percentage if needed or use from API
   const price = product ? Number(product.price) : 0
@@ -208,6 +211,106 @@ const ShopDetails = () => {
                       __html: product.description || ''
                     }}
                   />
+
+                  {/* <!-- Quantity + Actions --> */}
+                  <div className='flex items-center gap-4 mb-4.5'>
+                    <div className='flex items-center border border-gray-3 rounded-md overflow-hidden'>
+                      <button
+                        onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                        className='w-10 h-10 flex items-center justify-center text-dark hover:bg-gray-2 ease-out duration-200'
+                      >
+                        <svg width='16' height='2' viewBox='0 0 16 2' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                          <path d='M0 1H16' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' />
+                        </svg>
+                      </button>
+                      <span className='w-12 h-10 flex items-center justify-center font-medium text-dark border-x border-gray-3'>
+                        {quantity}
+                      </span>
+                      <button
+                        onClick={() => setQuantity((q) => Math.min(product.stock, q + 1))}
+                        className='w-10 h-10 flex items-center justify-center text-dark hover:bg-gray-2 ease-out duration-200'
+                      >
+                        <svg width='16' height='16' viewBox='0 0 16 16' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                          <path d='M8 0V16M0 8H16' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' />
+                        </svg>
+                      </button>
+                    </div>
+                    <span className='text-custom-sm text-dark-4'>
+                      {product.stock > 0 ? `${product.stock} sản phẩm` : 'Hết hàng'}
+                    </span>
+                  </div>
+
+                  <div className='flex flex-wrap items-center gap-4'>
+                    <button
+                      onClick={() => {
+                        if (product.stock === 0) return
+                        dispatch(
+                          addItemToCart({
+                            id: product.id,
+                            name: product.name,
+                            price,
+                            image: product.image || product.images?.[0]?.image || '/images/product/product-01.png',
+                            discountedPrice,
+                            quantity,
+                            stock: product.stock
+                          })
+                        )
+                      }}
+                      disabled={product.stock === 0}
+                      className='flex items-center gap-2 font-medium text-white bg-blue py-3 px-7 rounded-md ease-out duration-200 hover:bg-blue-dark disabled:opacity-50 disabled:cursor-not-allowed'
+                    >
+                      <svg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                        <path d='M2.5 3.33334H3.57918C3.76328 3.33334 3.92449 3.45199 3.97575 3.62882L6.02425 10.7046C6.07551 10.8814 6.23672 11 6.42082 11H14.5833C14.7717 11 14.9355 10.8763 14.9831 10.6944L16.4831 4.86108C16.5488 4.60887 16.3535 4.16667 16.0833 4.16667H5' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' />
+                        <circle cx='7.5' cy='14.1667' r='1.25' fill='currentColor' />
+                        <circle cx='13.3333' cy='14.1667' r='1.25' fill='currentColor' />
+                      </svg>
+                      Thêm vào giỏ
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        if (product.stock === 0) return
+                        dispatch(
+                          addItemToCart({
+                            id: product.id,
+                            name: product.name,
+                            price,
+                            image: product.image || product.images?.[0]?.image || '/images/product/product-01.png',
+                            discountedPrice,
+                            quantity,
+                            stock: product.stock
+                          })
+                        )
+                        router.push('/cart')
+                      }}
+                      disabled={product.stock === 0}
+                      className='font-medium text-white bg-dark py-3 px-7 rounded-md ease-out duration-200 hover:bg-dark-2 disabled:opacity-50 disabled:cursor-not-allowed'
+                    >
+                      Mua ngay
+                    </button>
+
+                    <button
+                      onClick={() =>
+                        dispatch(
+                          addItemToWishlist({
+                            id: product.id,
+                            name: product.name,
+                            price,
+                            image: product.image || product.images?.[0]?.image || '/images/product/product-01.png',
+                            discountedPrice,
+                            quantity: 1,
+                            status: product.stock > 0 ? 'available' : 'unavailable'
+                          })
+                        )
+                      }
+                      className='w-11 h-11 flex items-center justify-center rounded-md border border-gray-3 text-dark ease-out duration-200 hover:text-red hover:border-red'
+                      aria-label='Thêm vào wishlist'
+                    >
+                      <svg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                        <path d='M10 16.6667C10 16.6667 2.5 12.5 2.5 7.08333C2.5 5.84107 3.30089 4.16667 5 3.33333C6.69911 2.5 8.61111 3.05556 10 4.44444C11.3889 3.05556 13.3009 2.5 15 3.33333C16.6991 4.16667 17.5 5.84107 17.5 7.08333C17.5 12.5 10 16.6667 10 16.6667Z' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round' />
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

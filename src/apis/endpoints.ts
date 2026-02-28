@@ -49,6 +49,16 @@ export const API_ENDPOINTS = {
     ACTIVE: '/vouchers/active'
   },
 
+  // Cart Management
+  CART: {
+    GET: '/cart',
+    ADD: '/cart/add',
+    UPDATE: '/cart/update',
+    REMOVE: (productId: number | string) => `/cart/remove/${productId}`,
+    SYNC: '/cart/sync',
+    CLEAR: '/cart/clear'
+  },
+
   // Shipping Address Management
   SHIPPING_ADDRESSES: {
     LIST: '/shipping-addresses',

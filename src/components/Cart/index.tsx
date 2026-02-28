@@ -14,20 +14,33 @@ import ConfirmationModal from '../Common/ConfirmationModal'
 
 import { removeAllItemsFromCart } from '@/redux/slices/cartSlice'
 
-
 const Cart = () => {
   const dispatch = useAppDispatch()
   const cartItems = useAppSelector((state) => state.cartReducer.cartItems)
+  const isAuthenticated = useAppSelector((state) => state.authReducer.isAuthenticated)
   const [showClearCartConfirm, setShowClearCartConfirm] = React.useState(false)
+  const [clearing, setClearing] = React.useState(false)
 
   const handleClearCartClick = () => {
     setShowClearCartConfirm(true)
   }
 
-  const handleConfirmClearCart = () => {
-    dispatch(removeAllItemsFromCart())
-    toast.success('Đã xóa giỏ hàng')
+  const handleConfirmClearCart = async () => {
+    setClearing(true)
     setShowClearCartConfirm(false)
+
+    try {
+      dispatch(removeAllItemsFromCart())
+
+      // Nếu đã đăng nhập, chờ thêm 1 tick để middleware hoàn tất gọi API
+      if (isAuthenticated) {
+        await new Promise((resolve) => setTimeout(resolve, 300))
+      }
+
+      toast.success('Đã xóa giỏ hàng')
+    } finally {
+      setClearing(false)
+    }
   }
 
   return (
@@ -44,9 +57,20 @@ const Cart = () => {
               <h2 className='font-medium text-dark text-2xl'>Your Cart</h2>
               <button 
                 onClick={handleClearCartClick}
-                className='text-blue hover:text-blue-dark transition-colors'
+                disabled={clearing}
+                className='flex items-center gap-2 text-red hover:text-red/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors'
               >
-                Clear Shopping Cart
+                {clearing ? (
+                  <>
+                    <svg className='animate-spin w-4 h-4' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                      <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
+                      <path className='opacity-75' fill='currentColor' d='M4 12a8 8 0 018-8v8z' />
+                    </svg>
+                    Đang xóa...
+                  </>
+                ) : (
+                  'Clear Shopping Cart'
+                )}
               </button>
             </div>
 
