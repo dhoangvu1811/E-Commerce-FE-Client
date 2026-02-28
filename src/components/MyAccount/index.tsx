@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react'
 
 import Image from 'next/image'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 import toast from 'react-hot-toast'
 
@@ -12,6 +12,7 @@ import AddressList from './AddressList'
 import ConfirmationModal from '../Common/ConfirmationModal'
 import Orders from '../Orders'
 import Sessions from './Sessions'
+import Notifications from './Notifications'
 import { useAppDispatch, useAppSelector } from '@/redux/store'
 import { logout, fetchProfile } from '@/redux/slices/authSlice'
 
@@ -23,14 +24,23 @@ const MyAccount = () => {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
-
   const dispatch = useAppDispatch()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { user } = useAppSelector((state) => state.authReducer)
 
   useEffect(() => {
     dispatch(fetchProfile())
   }, [dispatch])
+
+  // Đọc tab từ query param (ví dụ: ?tab=notifications)
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+
+    if (tab) {
+      setActiveTab(tab)
+    }
+  }, [searchParams])
 
   // Format member since date
   const getMemberSince = () => {
@@ -259,6 +269,36 @@ return `Member Since ${date.toLocaleDateString('en-US', { month: 'short', year: 
                     </button>
 
                     <button
+                      onClick={() => setActiveTab('notifications')}
+                      className={`flex items-center rounded-md gap-2.5 py-3 px-4.5 ease-out duration-200 hover:bg-blue hover:text-white ${
+                        activeTab === 'notifications'
+                          ? 'text-white bg-blue'
+                          : 'text-dark-2 bg-gray-1'
+                      }`}
+                    >
+                      <svg
+                        className='fill-current'
+                        width='22'
+                        height='22'
+                        viewBox='0 0 24 24'
+                        fill='none'
+                        xmlns='http://www.w3.org/2000/svg'
+                      >
+                        <path
+                          fillRule='evenodd'
+                          clipRule='evenodd'
+                          d='M12 2C8.68629 2 6 4.68629 6 8V9.58579C6 10.0066 5.83268 10.4101 5.53553 10.7071L4.29289 11.9497C3.47582 12.7668 3 13.8613 3 15.0042V15.5C3 16.8807 4.11929 18 5.5 18H18.5C19.8807 18 21 16.8807 21 15.5V15.0042C21 13.8613 20.5242 12.7668 19.7071 11.9497L18.4645 10.7071C18.1673 10.4101 18 10.0066 18 9.58579V8C18 4.68629 15.3137 2 12 2ZM8 8C8 5.79086 9.79086 4 12 4C14.2091 4 16 5.79086 16 8V9.58579C16 10.5371 16.378 11.4495 17.0503 12.1213L18.2929 13.364C18.7456 13.8167 19 14.3977 19 15.0042V15.5C19 15.7761 18.7761 16 18.5 16H5.5C5.22386 16 5 15.7761 5 15.5V15.0042C5 14.3977 5.25439 13.8167 5.70711 13.364L6.94975 12.1213C7.62203 11.4495 8 10.5371 8 9.58579V8Z'
+                          fill=''
+                        />
+                        <path
+                          d='M10.0681 19.0625C10.0233 19.3403 10 19.6264 10 19.9178C10 20.4142 10.1316 20.8811 10.3618 21.2874C10.7471 21.966 11.5011 22.4178 12.3618 22.4178C13.2224 22.4178 13.9765 21.966 14.3618 21.2874C14.5919 20.8811 14.7236 20.4142 14.7236 19.9178C14.7236 19.6264 14.7002 19.3403 14.6555 19.0625H10.0681Z'
+                          fill=''
+                        />
+                      </svg>
+                      Notifications
+                    </button>
+
+                    <button
                       onClick={() => setActiveTab('sessions')}
                       className={`flex items-center rounded-md gap-2.5 py-3 px-4.5 ease-out duration-200 hover:bg-blue hover:text-white ${
                         activeTab === 'sessions'
@@ -398,6 +438,15 @@ return `Member Since ${date.toLocaleDateString('en-US', { month: 'short', year: 
               <AccountDetails />
             </div>
             {/* <!-- details tab content end -->
+          <!-- notifications tab content start --> */}
+            <div
+              className={`xl:max-w-[770px] w-full bg-white rounded-xl shadow-1 ${
+                activeTab === 'notifications' ? 'block' : 'hidden'
+              }`}
+            >
+              <Notifications />
+            </div>
+            {/* <!-- notifications tab content end -->
           <!-- sessions tab content start --> */}
             <div
               className={`xl:max-w-[770px] w-full ${
