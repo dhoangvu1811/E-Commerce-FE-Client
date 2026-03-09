@@ -16,6 +16,7 @@ import voucherReducer from './slices/voucherSlice'
 import notificationReducer from './slices/notificationSlice'
 
 import { cartListenerMiddleware } from './middleware/cartListenerMiddleware'
+import { wishlistListenerMiddleware } from './middleware/wishlistListenerMiddleware'
 import { injectStore } from '@/apis/axiosInstance'
 
 // store khởi tạo với cartItems = [] trên cả server lẫn client
@@ -36,7 +37,9 @@ export const store = configureStore({
     notificationReducer
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().prepend(cartListenerMiddleware.middleware)
+    getDefaultMiddleware()
+      .prepend(cartListenerMiddleware.middleware)
+      .prepend(wishlistListenerMiddleware.middleware)
 })
 
 // Inject store to axios instance to avoid circular dependency

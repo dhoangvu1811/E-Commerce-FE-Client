@@ -76,6 +76,12 @@ export const API_ENDPOINTS = {
     UPDATE: (id: number) => `/shipping-addresses/${id}`,
     DELETE: (id: number) => `/shipping-addresses/${id}`,
     SET_DEFAULT: (id: number) => `/shipping-addresses/${id}/default`
+  },
+
+  // Wishlist Management
+  WISHLIST: {
+    GET: '/wishlist',
+    TOGGLE: '/wishlist/toggle'
   }
 } as const
 
