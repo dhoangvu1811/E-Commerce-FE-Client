@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 import Image from 'next/image'
 
-import { useDispatch } from 'react-redux'
+import { useRouter } from 'next/navigation'
 
 import { formatCurrency } from '@/utils/formatCurrency'
 
@@ -13,13 +13,21 @@ import type { Product } from '@/types/product.type'
 import { useModalContext } from '@/app/context/QuickViewModalContext'
 import { updateQuickView } from '@/redux/slices/quickViewSlice'
 import { addItemToCart } from '@/redux/slices/cartSlice'
-import { addItemToWishlist } from '@/redux/slices/wishlistSlice'
-import type { AppDispatch } from '@/redux/store'
+import {
+  toggleWishlistItem,
+  selectIsInWishlist,
+  selectIsToggling
+} from '@/redux/slices/wishlistSlice'
+import { useAppDispatch, useAppSelector } from '@/redux/store'
 
 
 const SingleListItem = ({ item }: { item: Product }) => {
   const { openModal } = useModalContext()
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useAppDispatch()
+  const router = useRouter()
+  const { isAuthenticated } = useAppSelector((state) => state.authReducer)
+  const isInWishlist = useAppSelector(selectIsInWishlist(item.id))
+  const isWishlistToggling = useAppSelector(selectIsToggling(item.id))
 
   // Calculate discount and price
   const price = Number(item.price)
@@ -51,20 +59,14 @@ const SingleListItem = ({ item }: { item: Product }) => {
   }
 
   const handleItemToWishList = () => {
-    dispatch(
-      addItemToWishlist({
-        id: item.id,
-        name: item.name,
-        price,
-        image:
-          item.image ||
-          item.images?.[0]?.image ||
-          '/images/product/product-01.png',
-        discountedPrice,
-        quantity: 1,
-        status: 'available'
-      })
-    )
+    if (!isAuthenticated) {
+      router.push('/signin')
+
+      return
+    }
+
+    if (isWishlistToggling) return
+    dispatch(toggleWishlistItem(item.id))
   }
 
   return (
@@ -133,8 +135,9 @@ const SingleListItem = ({ item }: { item: Product }) => {
 
             <button
               onClick={() => handleItemToWishList()}
-              aria-label='button for favorite select'
-              className='flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 ease-out duration-200 text-dark bg-white hover:text-blue'
+              disabled={isWishlistToggling}
+              aria-label={isInWishlist ? 'Xóa khỏi danh sách yêu thích' : 'Thêm vào danh sách yêu thích'}
+              className={`flex items-center justify-center w-9 h-9 rounded-[5px] shadow-1 ease-out duration-200 bg-white disabled:opacity-50 ${isInWishlist ? 'text-red' : 'text-dark hover:text-red'}`}
             >
               <svg
                 className='fill-current'
