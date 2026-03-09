@@ -15,6 +15,7 @@ import { menuData } from './menuData'
 import Dropdown from './Dropdown'
 import { useAppSelector, useAppDispatch } from '@/redux/store'
 import { selectTotalPrice } from '@/redux/slices/cartSlice'
+import { selectWishlistCount } from '@/redux/slices/wishlistSlice'
 import { fetchNotifications } from '@/redux/slices/notificationSlice'
 import { useCartModalContext } from '@/app/context/CartSidebarModalContext'
 
@@ -38,6 +39,7 @@ const Header = () => {
   const { isAuthenticated, user } = useAppSelector((state) => state.authReducer)
   const product = useAppSelector((state) => state.cartReducer.cartItems)
   const totalPrice = useSelector(selectTotalPrice)
+  const wishlistCount = useAppSelector(selectWishlistCount)
   const { unreadCount } = useAppSelector((state) => state.notificationReducer)
 
   useEffect(() => {
@@ -324,6 +326,35 @@ const Header = () => {
                         Sign In
                       </p>
                     </div>
+                  </Link>
+                )}
+
+                {/* Wishlist icon - chỉ hiển thị khi đăng nhập */}
+                {isAuthenticated && (
+                  <Link
+                    href='/wishlist'
+                    className='relative inline-flex items-center justify-center'
+                    title='Danh sách yêu thích'
+                  >
+                    <svg
+                      width='24'
+                      height='24'
+                      viewBox='0 0 24 24'
+                      fill='none'
+                      xmlns='http://www.w3.org/2000/svg'
+                    >
+                      <path
+                        d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'
+                        fill={wishlistCount > 0 ? '#3C50E0' : 'none'}
+                        stroke='#3C50E0'
+                        strokeWidth='1.5'
+                      />
+                    </svg>
+                    {wishlistCount > 0 && (
+                      <span className='flex items-center justify-center font-medium text-2xs absolute -right-2 -top-2 bg-blue w-4.5 h-4.5 rounded-full text-white'>
+                        {wishlistCount > 99 ? '99+' : wishlistCount}
+                      </span>
+                    )}
                   </Link>
                 )}
 

@@ -11,7 +11,11 @@ import RecentlyViewdItems from './RecentlyViewd'
 import { usePreviewSlider } from '@/app/context/PreviewSliderContext'
 import { useAppDispatch, useAppSelector } from '@/redux/store'
 import { addItemToCart } from '@/redux/slices/cartSlice'
-import { addItemToWishlist } from '@/redux/slices/wishlistSlice'
+import {
+  toggleWishlistItem,
+  selectIsInWishlist,
+  selectIsToggling
+} from '@/redux/slices/wishlistSlice'
 
 import { fetchProductDetails } from '@/redux/slices/productDetailsSlice'
 import PreLoader from '../Common/PreLoader'
@@ -40,6 +44,14 @@ const ShopDetails = () => {
   const [activeTab, setActiveTab] = useState('tabOne')
   const [quantity, setQuantity] = useState(1)
   const router = useRouter()
+
+  const { isAuthenticated } = useAppSelector((state) => state.authReducer)
+  const isInWishlist = useAppSelector(
+    product ? selectIsInWishlist(product.id) : () => false
+  )
+  const isWishlistToggling = useAppSelector(
+    product ? selectIsToggling(product.id) : () => false
+  )
 
   // Calculate discount percentage if needed or use from API
   const price = product ? Number(product.price) : 0
@@ -290,24 +302,32 @@ const ShopDetails = () => {
                     </button>
 
                     <button
-                      onClick={() =>
-                        dispatch(
-                          addItemToWishlist({
-                            id: product.id,
-                            name: product.name,
-                            price,
-                            image: product.image || product.images?.[0]?.image || '/images/product/product-01.png',
-                            discountedPrice,
-                            quantity: 1,
-                            status: product.stock > 0 ? 'available' : 'unavailable'
-                          })
-                        )
-                      }
-                      className='w-11 h-11 flex items-center justify-center rounded-md border border-gray-3 text-dark ease-out duration-200 hover:text-red hover:border-red'
-                      aria-label='Thêm vào wishlist'
+                      onClick={() => {
+                        if (!isAuthenticated) {
+                          router.push('/signin')
+
+                          return
+                        }
+                        
+                        dispatch(toggleWishlistItem(product.id))
+                      }}
+                      disabled={isWishlistToggling}
+                      className={`w-11 h-11 flex items-center justify-center rounded-md border ease-out duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${
+                        isInWishlist
+                          ? 'border-red text-red bg-red/5'
+                          : 'border-gray-3 text-dark hover:text-red hover:border-red'
+                      }`}
+                      aria-label={isInWishlist ? 'Xóa khỏi wishlist' : 'Thêm vào wishlist'}
                     >
                       <svg width='20' height='20' viewBox='0 0 20 20' fill='none' xmlns='http://www.w3.org/2000/svg'>
-                        <path d='M10 16.6667C10 16.6667 2.5 12.5 2.5 7.08333C2.5 5.84107 3.30089 4.16667 5 3.33333C6.69911 2.5 8.61111 3.05556 10 4.44444C11.3889 3.05556 13.3009 2.5 15 3.33333C16.6991 4.16667 17.5 5.84107 17.5 7.08333C17.5 12.5 10 16.6667 10 16.6667Z' stroke='currentColor' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round' />
+                        <path
+                          d='M10 16.6667C10 16.6667 2.5 12.5 2.5 7.08333C2.5 5.84107 3.30089 4.16667 5 3.33333C6.69911 2.5 8.61111 3.05556 10 4.44444C11.3889 3.05556 13.3009 2.5 15 3.33333C16.6991 4.16667 17.5 5.84107 17.5 7.08333C17.5 12.5 10 16.6667 10 16.6667Z'
+                          fill={isInWishlist ? 'currentColor' : 'none'}
+                          stroke='currentColor'
+                          strokeWidth='1.5'
+                          strokeLinecap='round'
+                          strokeLinejoin='round'
+                        />
                       </svg>
                     </button>
                   </div>
