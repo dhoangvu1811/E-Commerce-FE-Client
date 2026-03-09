@@ -22,7 +22,10 @@ const AddressList = () => {
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editAddress, setEditAddress] = useState<ShippingAddressItem | null>(null)
-  
+
+  // Guard double-click cho setDefault / delete
+  const [processingId, setProcessingId] = useState<number | null>(null)
+
   // Confirmation Modal state
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [addressToDelete, setAddressToDelete] = useState<ShippingAddressItem | null>(null)
@@ -47,7 +50,9 @@ const AddressList = () => {
   }
 
   const handleConfirmDelete = async () => {
-    if (!addressToDelete) return
+    if (!addressToDelete || processingId !== null) return
+
+    setProcessingId(addressToDelete.id)
 
     try {
       await dispatch(deleteAddress(addressToDelete.id)).unwrap()
@@ -56,19 +61,25 @@ const AddressList = () => {
       setAddressToDelete(null)
     } catch (err: any) {
       toast.error(err || 'Không thể xóa địa chỉ')
+    } finally {
+      setProcessingId(null)
     }
   }
 
 
 
   const handleSetDefault = async (address: ShippingAddressItem) => {
-    if (address.isDefault) return
+    if (address.isDefault || processingId !== null) return
+
+    setProcessingId(address.id)
 
     try {
       await dispatch(setDefaultAddress(address.id)).unwrap()
       toast.success('Đã đặt làm địa chỉ mặc định')
     } catch (err: any) {
       toast.error(err || 'Không thể đặt mặc định')
+    } finally {
+      setProcessingId(null)
     }
   }
 
@@ -98,28 +109,53 @@ const AddressList = () => {
         <h3 className='font-medium text-xl text-dark'>
           Địa chỉ giao hàng ({addresses.length}/10)
         </h3>
-        {addresses.length < 10 && (
+        <div className='flex items-center gap-2'>
+          {/* Nút Refresh */}
           <button
-            onClick={handleCreate}
-            className='inline-flex items-center gap-1.5 font-medium text-white bg-blue py-2 px-4 rounded-md ease-out duration-200 hover:bg-blue-dark text-sm'
+            onClick={handleRetry}
+            title='Tải lại danh sách địa chỉ'
+            className='inline-flex items-center justify-center w-9 h-9 rounded-md border border-gray-3 bg-gray-1 ease-out duration-200 hover:bg-gray-3 text-dark-5 hover:text-dark'
           >
             <svg
               width='16'
               height='16'
-              viewBox='0 0 16 16'
+              viewBox='0 0 24 24'
               fill='none'
               xmlns='http://www.w3.org/2000/svg'
             >
               <path
-                d='M8 1V15M1 8H15'
+                d='M4 4v5h.582m15.356 2A8 8 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8 8 0 0 1-15.357-2m15.357 2H15'
                 stroke='currentColor'
                 strokeWidth='2'
                 strokeLinecap='round'
+                strokeLinejoin='round'
               />
             </svg>
-            Thêm địa chỉ
           </button>
-        )}
+
+          {addresses.length < 10 && (
+            <button
+              onClick={handleCreate}
+              className='inline-flex items-center gap-1.5 font-medium text-white bg-blue py-2 px-4 rounded-md ease-out duration-200 hover:bg-blue-dark text-sm'
+            >
+              <svg
+                width='16'
+                height='16'
+                viewBox='0 0 16 16'
+                fill='none'
+                xmlns='http://www.w3.org/2000/svg'
+              >
+                <path
+                  d='M8 1V15M1 8H15'
+                  stroke='currentColor'
+                  strokeWidth='2'
+                  strokeLinecap='round'
+                />
+              </svg>
+              Thêm địa chỉ
+            </button>
+          )}
+        </div>
       </div>
 
       {addresses.length === 0 ? (
@@ -181,9 +217,10 @@ const AddressList = () => {
                     <span className='text-gray-4'>|</span>
                     <button
                       onClick={() => handleSetDefault(addr)}
-                      className='text-sm text-dark-5 ease-out duration-200 hover:text-blue'
+                      disabled={processingId === addr.id}
+                      className='text-sm text-dark-5 ease-out duration-200 hover:text-blue disabled:opacity-50 disabled:cursor-not-allowed'
                     >
-                      Đặt mặc định
+                      {processingId === addr.id ? 'Đang xử lý...' : 'Đặt mặc định'}
                     </button>
                     <span className='text-gray-4'>|</span>
                     <button
