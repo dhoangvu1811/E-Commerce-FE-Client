@@ -3,13 +3,10 @@ import React, { useEffect, useState } from 'react'
 
 import Image from 'next/image'
 
-import { useDispatch } from 'react-redux'
-
 import { formatCurrency } from '@/utils/formatCurrency'
 
 import { useModalContext } from '@/app/context/QuickViewModalContext'
-import type { AppDispatch} from '@/redux/store';
-import { useAppSelector } from '@/redux/store'
+import { useAppSelector, useAppDispatch } from '@/redux/store'
 import { addItemToCart } from '@/redux/slices/cartSlice'
 
 import { usePreviewSlider } from '@/app/context/PreviewSliderContext'
@@ -21,7 +18,7 @@ const QuickViewModal = () => {
   const { openPreviewModal } = usePreviewSlider()
   const [quantity, setQuantity] = useState(1)
 
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useAppDispatch()
 
   // get the product data
   const product = useAppSelector((state) => state.quickViewReducer.value)
