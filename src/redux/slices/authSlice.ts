@@ -18,13 +18,15 @@ interface AuthState {
   isAuthenticated: boolean
   loading: boolean
   error: string | null
+  initialized: boolean  // true sau khi fetchProfile đã resolve hoặc reject lần đầu
 }
 
 const initialState: AuthState = {
   user: null,
   isAuthenticated: false,
   loading: false,
-  error: null
+  error: null,
+  initialized: false
 }
 
 // Thunks
@@ -261,10 +263,12 @@ const authSlice = createSlice({
       .addCase(fetchProfile.fulfilled, (state, action) => {
         state.isAuthenticated = true
         state.user = action.payload
+        state.initialized = true
       })
       .addCase(fetchProfile.rejected, (state) => {
         state.user = null
         state.isAuthenticated = false
+        state.initialized = true
       })
 
       // Update Profile
