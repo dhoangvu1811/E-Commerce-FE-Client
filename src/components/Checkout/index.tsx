@@ -14,7 +14,7 @@ import { useAppDispatch, useAppSelector } from '@/redux/store'
 import { selectCartItems, selectTotalPrice, removeAllItemsFromCart } from '@/redux/slices/cartSlice'
 import { createOrder, clearOrderError } from '@/redux/slices/orderSlice'
 import { resetVoucher } from '@/redux/slices/voucherSlice'
-import { fetchMyAddresses, selectAddresses } from '@/redux/slices/shippingAddressSlice'
+import { fetchMyAddresses, selectAddresses, updateAddress } from '@/redux/slices/shippingAddressSlice'
 import type { PaymentMethod as PaymentMethodType, CreateOrderPayload } from '@/types/order.type'
 
 const Checkout = () => {
@@ -30,6 +30,13 @@ const Checkout = () => {
 
   // Selected saved address id (null = initial load, '' = new address)
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
+
+  // Checkbox: có lưu thay đổi vào DB sau khi đặt hàng thành công không
+  const [saveAddressChanges, setSaveAddressChanges] = useState(false)
+
+  // Cache lưu các chỉnh sửa của người dùng theo từng address id
+  // Giúp khôi phục edits khi người dùng switch qua lại giữa các địa chỉ
+  const [addressFormCache, setAddressFormCache] = useState<Record<string, { name: string; phone: string; address: string; city: string; province: string }>>({})
 
   // Shipping address form
   const [shippingAddress, setShippingAddress] = useState({
@@ -61,14 +68,39 @@ const Checkout = () => {
     }
   }, [addresses, selectedAddressId])
 
+  // Kiểm tra form có bị thay đổi so với địa chỉ gốc trong DB không
+  const isAddressModified = useMemo(() => {
+    if (!selectedAddressId || selectedAddressId === '') return false
+
+    const original = addresses.find((a) => String(a.id) === selectedAddressId)
+
+    if (!original) return false
+
+    return (
+      shippingAddress.name !== original.fullName ||
+      shippingAddress.phone !== original.phone ||
+      shippingAddress.address !== original.address ||
+      shippingAddress.city !== original.city ||
+      shippingAddress.province !== original.province
+    )
+  }, [selectedAddressId, shippingAddress, addresses])
+
   // Handle address selection
   const handleAddressSelect = (id: string) => {
     setSelectedAddressId(id)
+    setSaveAddressChanges(false) // reset checkbox khi chuyển địa chỉ
 
     if (id === '') {
       setShippingAddress({ name: '', phone: '', address: '', city: '', province: '' })
-      
-return
+
+      return
+    }
+
+    // Ưu tiên lấy từ cache nếu người dùng đã chỉnh sửa địa chỉ này trước đó
+    if (addressFormCache[id]) {
+      setShippingAddress(addressFormCache[id])
+
+      return
     }
 
     const addr = addresses.find((a) => String(a.id) === id)
@@ -101,7 +133,14 @@ return
   }, [subtotal, shippingFee, discount])
 
   const handleShippingChange = (field: string, value: string) => {
-    setShippingAddress((prev) => ({ ...prev, [field]: value }))
+    const updated = { ...shippingAddress, [field]: value }
+
+    setShippingAddress(updated)
+
+    // Sync chỉnh sửa vào cache để không mất khi người dùng switch địa chỉ và quay lại
+    if (selectedAddressId) {
+      setAddressFormCache((prev) => ({ ...prev, [selectedAddressId]: updated }))
+    }
   }
 
   const validateForm = (): boolean => {
@@ -174,8 +213,31 @@ return errors.length === 0
     }
 
     try {
-      const result = await dispatch(createOrder(payload)).unwrap()
+      // Cập nhật địa chỉ TRƯỚC khi tạo đơn để tránh tạo 2 địa chỉ mới
+      // Logic: orderService.create dùng findFirst theo form data để tìm address.
+      // Nếu update sau → findFirst không match → tạo address thừa.
+      // Nếu update trước → findFirst tìm thấy address đã update → dùng luôn, không tạo thêm.
+      if (saveAddressChanges && selectedAddressId && selectedAddressId !== '') {
+        try {
+          await dispatch(
+            updateAddress({
+              id: Number(selectedAddressId),
+              payload: {
+                fullName: shippingAddress.name.trim(),
+                phone: shippingAddress.phone.trim(),
+                address: shippingAddress.address.trim(),
+                city: shippingAddress.city.trim(),
+                province: shippingAddress.province.trim()
+              }
+            })
+          ).unwrap()
+        } catch {
+          // Không block việc đặt hàng nếu update address thất bại
+          toast.error('Không thể lưu thay đổi địa chỉ, tiến hành đặt hàng với thông tin hiện tại.')
+        }
+      }
 
+      const result = await dispatch(createOrder(payload)).unwrap()
 
       // Clear cart và voucher sau khi đặt hàng thành công
       dispatch(removeAllItemsFromCart())
@@ -241,6 +303,21 @@ return errors.length === 0
                         </option>
                       ))}
                     </select>
+
+                    {/* Checkbox lưu thay đổi — chỉ hiện khi form khác dữ liệu gốc */}
+                    {isAddressModified && (
+                      <label className='flex items-center gap-2 mt-3 cursor-pointer select-none'>
+                        <input
+                          type='checkbox'
+                          checked={saveAddressChanges}
+                          onChange={(e) => setSaveAddressChanges(e.target.checked)}
+                          className='w-4 h-4 accent-blue cursor-pointer'
+                        />
+                        <span className='text-sm text-dark-5'>
+                          Cập nhật địa chỉ đã lưu với thông tin mới
+                        </span>
+                      </label>
+                    )}
                   </div>
                 )}
 
