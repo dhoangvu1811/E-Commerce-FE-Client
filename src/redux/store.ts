@@ -14,6 +14,7 @@ import orderReducer from './slices/orderSlice'
 import shippingAddressReducer from './slices/shippingAddressSlice'
 import voucherReducer from './slices/voucherSlice'
 import notificationReducer from './slices/notificationSlice'
+import reviewReducer from './slices/reviewSlice'
 
 import { cartListenerMiddleware } from './middleware/cartListenerMiddleware'
 import { wishlistListenerMiddleware } from './middleware/wishlistListenerMiddleware'
@@ -34,7 +35,8 @@ export const store = configureStore({
     orderReducer,
     shippingAddressReducer,
     voucherReducer,
-    notificationReducer
+    notificationReducer,
+    reviewReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
