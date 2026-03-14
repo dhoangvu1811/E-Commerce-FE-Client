@@ -1,11 +1,96 @@
-import React from "react";
+/* eslint-disable react/no-unescaped-entities */
+'use client'
 
-import Breadcrumb from "../Common/Breadcrumb";
+import React, { useState } from 'react'
+
+import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+
+import Breadcrumb from '../Common/Breadcrumb'
+import { contactService } from '@/services'
+
+interface ContactFormValues {
+  firstName: string
+  lastName: string
+  email: string
+  phoneNumber: string
+  message: string
+}
+
+const COMMON_EMAIL_DOMAIN_TYPOS: Record<string, string> = {
+  'gmmail.com': 'gmail.com',
+  'gmial.com': 'gmail.com',
+  'gmail.con': 'gmail.com',
+  'gmai.com': 'gmail.com',
+  'yaho.com': 'yahoo.com',
+  'yhoo.com': 'yahoo.com',
+  'hotnail.com': 'hotmail.com',
+  'hotmai.com': 'hotmail.com',
+  'outllok.com': 'outlook.com',
+  'outlok.com': 'outlook.com'
+}
+
+const validateEmailDomain = (email: string): true | string => {
+  const normalizedEmail = email.trim().toLowerCase()
+  const domain = normalizedEmail.split('@')[1]
+
+  if (!domain) {
+    return true
+  }
+
+  const suggestedDomain = COMMON_EMAIL_DOMAIN_TYPOS[domain]
+
+  if (suggestedDomain) {
+
+    return `Did you mean ${normalizedEmail.split('@')[0]}@${suggestedDomain}?`
+  }
+
+  return true
+}
 
 const Contact = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors }
+  } = useForm<ContactFormValues>()
+
+  const onSubmit = async (values: ContactFormValues) => {
+    if (isSubmitting) return
+
+    const fullName = `${values.firstName} ${values.lastName}`.trim()
+
+    if (fullName.length > 100) {
+      toast.error('Full name is too long (max 100 characters)')
+
+      return
+    }
+
+    try {
+      setIsSubmitting(true)
+
+      const response = await contactService.create({
+        fullName,
+        email: values.email.trim(),
+        phoneNumber: values.phoneNumber.trim(),
+        message: values.message.trim()
+      })
+
+      toast.success(response.message)
+      reset()
+    } catch {
+      // Error toast handled by axios interceptor
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <>
-      <Breadcrumb title={"Contact"} pages={["contact"]} />
+      <Breadcrumb title={'Contact'} pages={['contact']} />
 
       <section className="overflow-hidden py-20 bg-gray-2">
         <div className="max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0">
@@ -88,7 +173,7 @@ const Contact = () => {
             </div>
 
             <div className="xl:max-w-[770px] w-full bg-white rounded-xl shadow-1 p-4 sm:p-7.5 xl:p-10">
-              <form>
+              <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
                   <div className="w-full">
                     <label htmlFor="firstName" className="block mb-2.5">
@@ -100,8 +185,25 @@ const Contact = () => {
                       name="firstName"
                       id="firstName"
                       placeholder="Jhon"
+                      {...register('firstName', {
+                        setValueAs: (value: string) => value.trim(),
+                        required: 'First name is required',
+                        minLength: {
+                          value: 2,
+                          message: 'First name is too short'
+                        },
+                        maxLength: {
+                          value: 50,
+                          message: 'First name is too long'
+                        }
+                      })}
                       className="rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-2.5 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
                     />
+                    {errors.firstName && (
+                      <span className="text-red text-sm">
+                        {errors.firstName.message}
+                      </span>
+                    )}
                   </div>
 
                   <div className="w-full">
@@ -114,38 +216,90 @@ const Contact = () => {
                       name="lastName"
                       id="lastName"
                       placeholder="Deo"
+                      {...register('lastName', {
+                        setValueAs: (value: string) => value.trim(),
+                        required: 'Last name is required',
+                        minLength: {
+                          value: 2,
+                          message: 'Last name is too short'
+                        },
+                        maxLength: {
+                          value: 50,
+                          message: 'Last name is too long'
+                        }
+                      })}
                       className="rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-2.5 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
                     />
+                    {errors.lastName && (
+                      <span className="text-red text-sm">
+                        {errors.lastName.message}
+                      </span>
+                    )}
                   </div>
                 </div>
 
                 <div className="flex flex-col lg:flex-row gap-5 sm:gap-8 mb-5">
                   <div className="w-full">
-                    <label htmlFor="subject" className="block mb-2.5">
-                      Subject
+                    <label htmlFor="email" className="block mb-2.5">
+                      Email <span className="text-red">*</span>
                     </label>
 
                     <input
-                      type="text"
-                      name="subject"
-                      id="subject"
-                      placeholder="Type your subject"
+                      type="email"
+                      name="email"
+                      id="email"
+                      placeholder="Enter your email"
+                      {...register('email', {
+                        setValueAs: (value: string) => value.trim(),
+                        required: 'Email is required',
+                        pattern: {
+                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                          message: 'Invalid email address'
+                        },
+                        validate: validateEmailDomain
+                      })}
                       className="rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-2.5 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
                     />
+                    {errors.email && (
+                      <span className="text-red text-sm">
+                        {errors.email.message}
+                      </span>
+                    )}
                   </div>
 
                   <div className="w-full">
-                    <label htmlFor="phone" className="block mb-2.5">
-                      Phone
+                    <label htmlFor="phoneNumber" className="block mb-2.5">
+                      Phone <span className="text-red">*</span>
                     </label>
 
                     <input
                       type="text"
-                      name="phone"
-                      id="phone"
+                      name="phoneNumber"
+                      id="phoneNumber"
                       placeholder="Enter your phone"
+                      {...register('phoneNumber', {
+                        setValueAs: (value: string) => value.trim(),
+                        required: 'Phone number is required',
+                        pattern: {
+                          value: /^[0-9+()\s-]+$/,
+                          message: 'Invalid phone number format'
+                        },
+                        minLength: {
+                          value: 10,
+                          message: 'Phone number must be at least 10 characters'
+                        },
+                        maxLength: {
+                          value: 15,
+                          message: 'Phone number must be at most 15 characters'
+                        }
+                      })}
                       className="rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full py-2.5 px-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
                     />
+                    {errors.phoneNumber && (
+                      <span className="text-red text-sm">
+                        {errors.phoneNumber.message}
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -159,15 +313,31 @@ const Contact = () => {
                     id="message"
                     rows={5}
                     placeholder="Type your message"
+                    {...register('message', {
+                      setValueAs: (value: string) => value.trim(),
+                      required: 'Message is required',
+                      minLength: {
+                        value: 10,
+                        message: 'Message must be at least 10 characters'
+                      },
+                      maxLength: {
+                        value: 1000,
+                        message: 'Message must be at most 1000 characters'
+                      }
+                    })}
                     className="rounded-md border border-gray-3 bg-gray-1 placeholder:text-dark-5 w-full p-5 outline-none duration-200 focus:border-transparent focus:shadow-input focus:ring-2 focus:ring-blue/20"
                   ></textarea>
+                  {errors.message && (
+                    <span className="text-red text-sm">{errors.message.message}</span>
+                  )}
                 </div>
 
                 <button
                   type="submit"
+                  disabled={isSubmitting}
                   className="inline-flex font-medium text-white bg-blue py-3 px-7 rounded-md ease-out duration-200 hover:bg-blue-dark"
                 >
-                  Send Message
+                  {isSubmitting ? 'Sending...' : 'Send Message'}
                 </button>
               </form>
             </div>
@@ -175,7 +345,7 @@ const Contact = () => {
         </div>
       </section>
     </>
-  );
-};
+  )
+}
 
-export default Contact;
+export default Contact
