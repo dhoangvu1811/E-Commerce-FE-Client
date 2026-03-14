@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 
 import Link from 'next/link'
 
+import Breadcrumb from '../Common/Breadcrumb'
+
 import { useAppDispatch, useAppSelector } from '@/redux/store'
 import { fetchActiveVouchers } from '@/redux/slices/voucherSlice'
 import { formatCurrency } from '@/utils/formatCurrency'
@@ -222,29 +224,13 @@ const Vouchers = () => {
 
   return (
     <>
-      {/* Breadcrumb */}
-      <section className='overflow-hidden py-5 bg-gray-2'>
-        <div className='max-w-[1170px] w-full mx-auto px-4 sm:px-8 xl:px-0'>
-          <ul className='flex items-center gap-2'>
-            <li>
-              <Link className='font-medium text-dark ease-out duration-200 hover:text-blue' href='/'>
-                Trang chủ
-              </Link>
-            </li>
-            <li className='text-dark-5'>/</li>
-            <li className='text-dark-5'>Mã giảm giá</li>
-          </ul>
-        </div>
-      </section>
+      <Breadcrumb title={'Mã giảm giá'} pages={['mã giảm giá']} />
 
       {/* Nội dung chính */}
       <section className='overflow-hidden py-12 bg-gray-2'>
         <div className='max-w-[860px] w-full mx-auto px-4 sm:px-8 xl:px-0'>
           {/* Tiêu đề */}
           <div className='mb-8'>
-            <h1 className='font-bold text-dark text-2xl sm:text-3xl mb-2'>
-              Mã giảm giá
-            </h1>
             <p className='text-dark-5'>
               Áp dụng mã giảm giá khi thanh toán để nhận ưu đãi tốt nhất.
             </p>
