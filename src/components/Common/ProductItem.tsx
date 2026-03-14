@@ -186,7 +186,7 @@ const ProductItem = ({ item }: { item: Product }) => {
           className='font-medium text-dark ease-out duration-200 hover:text-blue mb-1.5 line-clamp-2 min-h-[3rem]'
           onClick={() => handleProductDetails()}
         >
-          <Link href='/shop-details'>{item.name}</Link>
+          <Link href={`/shop-details?id=${item.id}`}>{item.name}</Link>
         </h3>
 
         <span className='mt-auto flex items-center gap-2 font-medium text-lg'>

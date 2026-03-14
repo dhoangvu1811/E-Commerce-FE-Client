@@ -82,6 +82,16 @@ export const API_ENDPOINTS = {
   WISHLIST: {
     GET: '/wishlist',
     TOGGLE: '/wishlist/toggle'
+  },
+
+  // Review Management
+  REVIEWS: {
+    BY_PRODUCT: (productId: number | string) => `/reviews/products/${productId}`,
+    SUMMARY: (productId: number | string) =>
+      `/reviews/products/${productId}/summary`,
+    MY_ELIGIBILITY: (productId: number | string) =>
+      `/reviews/products/${productId}/me`,
+    CREATE: '/reviews'
   }
 } as const
 
