@@ -92,6 +92,11 @@ export const API_ENDPOINTS = {
     MY_ELIGIBILITY: (productId: number | string) =>
       `/reviews/products/${productId}/me`,
     CREATE: '/reviews'
+  },
+
+  // Contact Management
+  CONTACTS: {
+    CREATE: '/contacts'
   }
 } as const
 
